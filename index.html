@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول - Vezash</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;display:flex;align-items:center;
+ justify-content:center;padding:20px;background:#101522;
+ color:white;font-family:Arial,sans-serif
+}
+.card{
+ width:100%;max-width:380px;padding:28px 22px;
+ background:#1b2335;border:1px solid #303b52;
+ border-radius:22px;text-align:center
+}
+.logo{
+ width:68px;height:68px;margin:0 auto 18px;
+ display:flex;align-items:center;justify-content:center;
+ background:#3478f6;border-radius:20px;font-size:30px;
+ font-weight:bold
+}
+h2{margin:0 0 10px;font-size:25px}
+.desc{color:#aeb9cc;font-size:14px;margin-bottom:25px}
+input{
+ width:100%;padding:15px;margin-bottom:13px;
+ background:#111827;border:1px solid #39445b;
+ border-radius:12px;color:white;font-size:15px;outline:none
+}
+input:focus{border-color:#4a8cff}
+button{
+ width:100%;padding:15px;border:0;border-radius:12px;
+ background:#3478f6;color:white;font-size:16px;
+ font-weight:bold;cursor:pointer;margin-top:5px
+}
+.secondary{background:transparent;color:#8eb5ff;margin-top:12px}
+#msg{font-size:14px;color:#ffcc80;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+ <div class="logo">V</div>
+ <h2 id="heading">أهلاً بيك</h2>
+ <div class="desc" id="desc">سجّل دخولك حتى تتابع</div>
+ <input id="email" type="email" placeholder="البريد الإلكتروني">
+ <input id="password" type="password" placeholder="كلمة السر">
+ <button type="button" onclick="submitForm()" id="mainBtn">تسجيل الدخول</button>
+ <button type="button" class="secondary" onclick="toggleMode()" id="switchBtn">إنشاء حساب جديد</button>
+ <div id="msg"></div>
+</div>
+<script>
+let isSignup=false;
+function toggleMode(){
+ isSignup=!isSignup;
+ document.getElementById('heading').textContent=isSignup?'إنشاء حساب جديد':'أهلاً بيك';
+ document.getElementById('desc').textContent=isSignup?'أنشئ حسابك للبدء':'سجّل دخولك حتى تتابع';
+ document.getElementById('mainBtn').textContent=isSignup?'إنشاء حساب':'تسجيل الدخول';
+ document.getElementById('switchBtn').textContent=isSignup?'عندي حساب بالفعل':'إنشاء حساب جديد';
+ document.getElementById('msg').textContent='';
+}
+function submitForm(){
+ const email=document.getElementById('email').value.trim();
+ const password=document.getElementById('password').value;
+ const msg=document.getElementById('msg');
+ if(!email||!password){msg.textContent='يرجى إدخال البريد الإلكتروني وكلمة السر';return;}
+ if(password.length<6){msg.textContent='كلمة السر لازم تكون 6 أحرف على الأقل';return;}
+ msg.textContent='الواجهة جاهزة، وربط الحسابات يحتاج إعداد Firebase.';
+}
+</script>
+</body>
+</html>
