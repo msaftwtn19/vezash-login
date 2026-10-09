@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -13,6 +14,7 @@ h2{margin:0 0 10px;font-size:25px}
 .desc{color:#aeb9cc;font-size:14px;margin-bottom:25px}
 input{width:100%;padding:15px;margin-bottom:13px;background:#111827;border:1px solid #39445b;border-radius:12px;color:white;font-size:15px;outline:none}
 button{width:100%;padding:15px;border:0;border-radius:12px;background:#3478f6;color:white;font-size:16px;font-weight:bold;cursor:pointer;margin-top:5px}
+button:disabled{opacity:.65;cursor:wait}
 .secondary{background:transparent;color:#8eb5ff;margin-top:12px}
 #msg{font-size:14px;color:#ffcc80;margin-top:16px;line-height:1.7}
 </style>
@@ -28,13 +30,15 @@ button{width:100%;padding:15px;border:0;border-radius:12px;background:#3478f6;co
     <button id="mainBtn" type="submit">تسجيل الدخول</button>
   </form>
   <button class="secondary" id="switchBtn" type="button">إنشاء حساب جديد</button>
-  <div id="msg" role="status"></div>
+  <div id="msg" role="status" aria-live="polite"></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -60,20 +64,37 @@ const passwordInput = document.getElementById("password");
 
 switchBtn.addEventListener("click", () => {
   isSignup = !isSignup;
+
   document.getElementById("heading").textContent =
     isSignup ? "إنشاء حساب جديد" : "أهلاً بيك";
+
   document.getElementById("desc").textContent =
     isSignup ? "أنشئ حسابك للبدء" : "سجّل دخولك حتى تتابع";
+
   mainBtn.textContent = isSignup ? "إنشاء حساب" : "تسجيل الدخول";
   switchBtn.textContent = isSignup ? "عندي حساب بالفعل" : "إنشاء حساب جديد";
   passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
+  passwordInput.value = "";
   msg.textContent = "";
 });
 
+function notifyMobizyLoginSuccess() {
+  // إشعار اختياري للصفحة الحاضنة؛ يحتاج مستقبلاً إلى
+  // كود استقبال داخل موبيزي حتى ينفّذ الانتقال إلى Vezash.
+  if (window.parent !== window) {
+    window.parent.postMessage(
+      { type: "VEZASH_LOGIN_SUCCESS" },
+      "*"
+    );
+  }
+}
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+
   const email = document.getElementById("email").value.trim();
   const password = passwordInput.value;
+
   mainBtn.disabled = true;
   mainBtn.textContent = "لحظة من فضلك...";
   msg.textContent = "";
@@ -81,10 +102,11 @@ form.addEventListener("submit", async (event) => {
   try {
     if (isSignup) {
       await createUserWithEmailAndPassword(auth, email, password);
-      msg.textContent = "تم إنشاء الحساب بنجاح!";
+      msg.textContent = "تم إنشاء الحساب بنجاح! تگدر هسة تسجّل دخولك.";
     } else {
       await signInWithEmailAndPassword(auth, email, password);
       msg.textContent = "تم تسجيل الدخول بنجاح!";
+      notifyMobizyLoginSuccess();
     }
   } catch (error) {
     const errors = {
@@ -96,7 +118,9 @@ form.addEventListener("submit", async (event) => {
       "auth/too-many-requests": "محاولات كثيرة. انتظر قليلاً ثم حاول مجدداً.",
       "auth/operation-not-allowed": "تسجيل البريد الإلكتروني غير مفعّل في Firebase."
     };
-    msg.textContent = errors[error.code] || "تعذرت العملية. رمز الخطأ: " + error.code;
+
+    msg.textContent =
+      errors[error.code] || "تعذرت العملية. رمز الخطأ: " + error.code;
   } finally {
     mainBtn.disabled = false;
     mainBtn.textContent = isSignup ? "إنشاء حساب" : "تسجيل الدخول";
