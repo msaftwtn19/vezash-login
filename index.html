@@ -3,87 +3,100 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VEZASH - النقاط والعملات</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0b1120;color:#fff;min-height:100vh;padding:20px 14px}
-main{max-width:480px;margin:auto}
-header{text-align:center;padding:20px 0 25px}
-.logo{font-size:34px;font-weight:900;letter-spacing:2px;color:#62e6c4}
-header p,.info,small{color:#aebbd0}
-.card{background:#141f32;border:1px solid #28364d;border-radius:20px;padding:20px;margin-bottom:15px}
-h2{font-size:19px;margin:0 0 17px}
-.balances{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.balance{background:#1d2a40;border-radius:15px;padding:16px 10px;text-align:center}
-.balance span{display:block;color:#aebbd0;font-size:14px;margin-bottom:10px}
-.balance strong{font-size:27px;color:#62e6c4}
-.balance.coins strong{color:#ffd166}
-button{border:0;border-radius:12px;padding:14px 12px;font-size:16px;font-weight:bold;cursor:pointer;width:100%;background:#62e6c4;color:#102033;margin-top:12px}
-button:disabled{opacity:.45;cursor:not-allowed}
-.info{font-size:13px;line-height:1.8}
-.status{margin-top:13px;font-size:14px;line-height:1.8;color:#62e6c4}
-.product{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.product button{width:auto;min-width:100px}
-small{display:block;margin-top:7px}
-#message{text-align:center;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
-footer{text-align:center;color:#76849b;font-size:12px;padding:10px}
+body{
+  margin:0;padding:20px;
+  font-family:Arial,sans-serif;
+  background:#07111f;color:#fff;
+}
+.container{max-width:500px;margin:auto}
+header{text-align:center;padding:25px 0}
+.logo{font-size:36px;font-weight:bold;color:#55d6ff}
+.subtitle{color:#a8b7ca;margin-top:10px}
+.card{
+  background:#111f33;
+  border:1px solid #263c57;
+  border-radius:18px;
+  padding:20px;margin-bottom:16px;
+}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{text-align:center}
+.number{font-size:30px;font-weight:bold;margin:14px 0;color:#55d6ff}
+h2{font-size:19px;margin-top:0}
+button{
+  width:100%;padding:14px;border:0;border-radius:12px;
+  background:#45c7f5;color:#06111e;
+  font-size:16px;font-weight:bold;cursor:pointer;
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+.note{color:#a8b7ca;font-size:13px;line-height:1.8}
+#message{margin:12px 0;line-height:1.8}
 </style>
 </head>
+
 <body>
-<main>
-<header>
-<div class="logo">VEZASH</div>
-<p>اجمع نقاطك واستبدلها بالعملات</p>
-</header>
+<div class="container">
+  <header>
+    <div class="logo">VEZASH</div>
+    <div class="subtitle">اجمع النقاط واستبدلها بالعملات</div>
+  </header>
 
-<section class="card">
-<h2>رصيدك</h2>
-<div class="balances">
-<div class="balance"><span>⭐ النقاط</span><strong id="points">0</strong></div>
-<div class="balance coins"><span>🪙 العملات</span><strong id="coins">0</strong></div>
+  <div class="card stats">
+    <div class="stat">
+      <h2>⭐ نقاطك</h2>
+      <div class="number" id="points">0</div>
+    </div>
+    <div class="stat">
+      <h2>🪙 عملاتك</h2>
+      <div class="number" id="coins">0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎁 المكافأة اليومية</h2>
+    <p>استلم 10 نقاط كل 24 ساعة.</p>
+    <button id="claimBtn" disabled>جاري الاتصال...</button>
+    <p class="note" id="timer"></p>
+  </div>
+
+  <div class="card">
+    <h2>🛒 متجر العملات</h2>
+    <p>استبدل 100 نقطة مقابل 10 عملات.</p>
+    <button id="buyBtn" disabled>استبدال 100 نقطة</button>
+  </div>
+
+  <div id="message" role="status">جاري الاتصال بقاعدة البيانات...</div>
+  <p class="note">VEZASH ©</p>
 </div>
-</section>
-
-<section class="card">
-<h2>🎁 المكافأة اليومية</h2>
-<p class="info">احصل على 10 نقاط مرة كل 24 ساعة.</p>
-<button id="claimBtn" disabled>جارٍ الاتصال...</button>
-<div id="timer" class="status"></div>
-</section>
-
-<section class="card">
-<h2>🛍️ متجر العملات</h2>
-<div class="product">
-<div><strong>10 عملات 🪙</strong><small>السعر: 100 نقطة ⭐</small></div>
-<button id="buyBtn" disabled>شراء</button>
-</div>
-<p class="info">اجمع النقاط اليومية حتى تقدر تشتري العملات.</p>
-</section>
-
-<div id="message" role="status" aria-live="polite"></div>
-<footer>VEZASH ©</footer>
-</main>
 
 <script type="module">
-import { initializeApp } from
-"https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import {
- getAuth, signInAnonymously, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import {
- getDatabase, ref, get, runTransaction
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 
-/* ضع إعدادات تطبيق الويب الموجودة في Firebase هنا */
+import { getAuth, signInAnonymously }
+  from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+import { getDatabase, ref, get, runTransaction }
+  from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
 const firebaseConfig = {
-  apiKey: "ضع_API_KEY",
-  authDomain: "ضع_AUTH_DOMAIN",
-  databaseURL: "ضع_DATABASE_URL",
-  projectId: "ضع_PROJECT_ID",
-  appId: "ضع_APP_ID"
+  apiKey: "AIzaSyCVg6fylaZjhgtAlh_LNIOpExpBa0FZ21g",
+  authDomain: "vezash.firebaseapp.com",
+  databaseURL: "https://vezash-default-rtdb.firebaseio.com",
+  projectId: "vezash",
+  storageBucket: "vezash.firebasestorage.app",
+  messagingSenderId: "1069891769244",
+  appId: "1:1069891769244:web:1056f47de64789c1406e59",
+  measurementId: "G-02CRNVKKEL"
 };
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
 const pointsEl = document.getElementById("points");
 const coinsEl = document.getElementById("coins");
@@ -93,113 +106,131 @@ const timerEl = document.getElementById("timer");
 const messageEl = document.getElementById("message");
 
 const DAY = 24 * 60 * 60 * 1000;
-const PRICE = 100;
-let db, user, busy = false, lastClaim = 0;
+let userRef = null;
+let busy = false;
 
 function message(text) {
   messageEl.textContent = text;
 }
-function formatTime(ms) {
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor(ms % 3600000 / 60000);
-  const s = Math.floor(ms % 60000 / 1000);
-  return `${h} ساعة و${m} دقيقة و${s} ثانية`;
-}
-function updateTimer() {
-  if (!user) return;
+
+function showData(data) {
+  const points = Number(data.points || 0);
+  const coins = Number(data.coins || 0);
+  const lastClaim = Number(data.lastClaim || 0);
+
+  pointsEl.textContent = points;
+  coinsEl.textContent = coins;
+
   const remaining = DAY - (Date.now() - lastClaim);
-  if (lastClaim && remaining > 0) {
-    claimBtn.disabled = busy || true;
-    claimBtn.textContent = "المكافأة غير متاحة حالياً";
-    timerEl.textContent = "المكافأة القادمة بعد: " + formatTime(remaining);
-  } else {
-    claimBtn.disabled = busy;
-    claimBtn.textContent = "استلام المكافأة";
+
+  claimBtn.disabled = busy || remaining > 0;
+
+  if (remaining <= 0) {
+    claimBtn.textContent = "استلام 10 نقاط";
     timerEl.textContent = "مكافأتك اليومية جاهزة!";
+  } else {
+    claimBtn.textContent = "تم استلام المكافأة";
+    const hours = Math.floor(remaining / 3600000);
+    const minutes = Math.ceil((remaining % 3600000) / 60000);
+    timerEl.textContent =
+      `المكافأة القادمة بعد ${hours} ساعة و${minutes} دقيقة تقريباً`;
   }
+
+  buyBtn.disabled = busy || points < 100;
 }
+
 async function refresh() {
-  const snapshot = await get(ref(db, "users/" + user.uid));
-  const data = snapshot.val() || {};
-  pointsEl.textContent = Number(data.points || 0);
-  coinsEl.textContent = Number(data.coins || 0);
-  lastClaim = Number(data.lastClaim || 0);
-  updateTimer();
+  const snapshot = await get(userRef);
+  showData(snapshot.val() || {
+    points: 0,
+    coins: 0,
+    lastClaim: 0
+  });
 }
-async function claimReward() {
-  if (!user || busy) return;
+
+async function transact(action) {
+  if (busy || !userRef) return;
+
   busy = true;
   claimBtn.disabled = true;
-  try {
-    const userRef = ref(db, "users/" + user.uid);
-    const result = await runTransaction(userRef, current => {
-      current = current || {points:0, coins:0, lastClaim:0};
-      if (Date.now() - Number(current.lastClaim || 0) < DAY) return;
-      current.points = Number(current.points || 0) + 10;
-      current.lastClaim = Date.now();
-      return current;
-    });
-    if (result.committed) message("مبروك! حصلت على 10 نقاط ⭐");
-    else message("استلمت مكافأتك مسبقاً. انتظر انتهاء الوقت.");
-    await refresh();
-  } catch (e) {
-    message("تعذر استلام المكافأة. تحقق من اتصال Firebase وقواعد الحماية.");
-    console.error(e);
-  } finally {
-    busy = false;
-    updateTimer();
-  }
-}
-async function buyCoins() {
-  if (!user || busy) return;
-  busy = true;
   buyBtn.disabled = true;
+  message("جاري تنفيذ العملية...");
+
   try {
-    const userRef = ref(db, "users/" + user.uid);
+    let reason = "";
+
     const result = await runTransaction(userRef, current => {
-      current = current || {points:0, coins:0, lastClaim:0};
-      if (Number(current.points || 0) < PRICE) return;
-      current.points = Number(current.points) - PRICE;
-      current.coins = Number(current.coins || 0) + 10;
-      return current;
+      const data = current || {
+        points: 0,
+        coins: 0,
+        lastClaim: 0
+      };
+
+      data.points = Number(data.points || 0);
+      data.coins = Number(data.coins || 0);
+      data.lastClaim = Number(data.lastClaim || 0);
+
+      if (action === "claim") {
+        if (Date.now() - data.lastClaim < DAY) {
+          reason = "استلمت المكافأة خلال آخر 24 ساعة.";
+          return;
+        }
+
+        data.points += 10;
+        data.lastClaim = Date.now();
+      }
+
+      if (action === "buy") {
+        if (data.points < 100) {
+          reason = "تحتاج إلى 100 نقطة حتى تستبدلها.";
+          return;
+        }
+
+        data.points -= 100;
+        data.coins += 10;
+      }
+
+      return data;
     });
-    message(result.committed
-      ? "تم الشراء! أضفنا 10 عملات إلى رصيدك 🪙"
-      : "نقاطك ما تكفي. تحتاج 100 نقطة للشراء.");
+
+    if (result.committed) {
+      message(action === "claim"
+        ? "تمت إضافة 10 نقاط إلى رصيدك!"
+        : "تم استبدال 100 نقطة بـ10 عملات!");
+    } else {
+      message(reason || "لم تكتمل العملية. حاول مرة ثانية.");
+    }
+
     await refresh();
-  } catch (e) {
-    message("تعذر إتمام الشراء. تحقق من اتصال Firebase وقواعد الحماية.");
-    console.error(e);
+  } catch (error) {
+    console.error(error);
+    message("تعذر الاتصال بقاعدة البيانات. تحقق من إعدادات Firebase.");
   } finally {
     busy = false;
-    buyBtn.disabled = false;
-    updateTimer();
+    try {
+      await refresh();
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
-claimBtn.addEventListener("click", claimReward);
-buyBtn.addEventListener("click", buyCoins);
+
+claimBtn.addEventListener("click", () => transact("claim"));
+buyBtn.addEventListener("click", () => transact("buy"));
 
 async function start() {
-  if (Object.values(firebaseConfig).some(v => !v || v.startsWith("ضع_"))) {
-    message("أضف إعدادات Firebase الخاصة بمشروعك داخل firebaseConfig أولاً.");
-    claimBtn.disabled = true;
-    buyBtn.disabled = true;
-    return;
-  }
   try {
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    db = getDatabase(app);
     const credential = await signInAnonymously(auth);
-    user = credential.user;
+    userRef = ref(db, "users/" + credential.user.uid);
+
     await refresh();
-    setInterval(updateTimer, 1000);
-    buyBtn.disabled = false;
-  } catch (e) {
-    message("تعذر الاتصال. تأكد من تفعيل Anonymous في Firebase ومن إعدادات قاعدة البيانات.");
-    console.error(e);
+    message("تم الاتصال بـ VEZASH بنجاح.");
+  } catch (error) {
+    console.error(error);
+    message("فشل الاتصال. تأكد من تفعيل Anonymous Auth وقواعد قاعدة البيانات في Firebase.");
   }
 }
+
 start();
 </script>
 </body>
