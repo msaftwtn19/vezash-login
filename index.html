@@ -11,25 +11,38 @@ body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:c
 .card{width:100%;max-width:380px;padding:28px 22px;background:#1b2335;border:1px solid #303b52;border-radius:22px;text-align:center}
 .logo{width:68px;height:68px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:#3478f6;border-radius:20px;font-size:30px;font-weight:bold}
 h2{margin:0 0 10px;font-size:25px}
-.desc{color:#aeb9cc;font-size:14px;margin-bottom:25px}
-input{width:100%;padding:15px;margin-bottom:13px;background:#111827;border:1px solid #39445b;border-radius:12px;color:white;font-size:15px;outline:none}
+.desc{color:#aeb9cc;font-size:14px;margin-bottom:25px;line-height:1.7}
+label{display:block;text-align:right;margin:12px 0 8px;color:#d9e2f2;font-size:14px}
+input{width:100%;padding:15px;margin-bottom:13px;background:#111827;border:1px solid #39445b;border-radius:12px;color:white;font-size:16px;outline:none;direction:ltr;text-align:left}
+input:focus{border-color:#3478f6}
 button{width:100%;padding:15px;border:0;border-radius:12px;background:#3478f6;color:white;font-size:16px;font-weight:bold;cursor:pointer;margin-top:5px}
 button:disabled{opacity:.65;cursor:wait}
-.secondary{background:transparent;color:#8eb5ff;margin-top:12px}
-#msg{font-size:14px;color:#ffcc80;margin-top:16px;line-height:1.7}
+.secondary{background:transparent;color:#8eb5ff;margin-top:12px;border:1px solid #39445b}
+#msg{font-size:14px;color:#ffcc80;margin-top:16px;line-height:1.8;overflow-wrap:anywhere}
+#recaptcha-container{display:flex;justify-content:center;margin:12px 0;overflow:hidden}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">V</div>
-  <h2 id="heading">أهلاً بيك</h2>
-  <div class="desc" id="desc">سجّل دخولك حتى تتابع</div>
-  <form id="authForm">
-    <input id="email" type="email" placeholder="البريد الإلكتروني" autocomplete="email" required>
-    <input id="password" type="password" placeholder="كلمة السر (6 أحرف على الأقل)" autocomplete="current-password" minlength="6" required>
-    <button id="mainBtn" type="submit">تسجيل الدخول</button>
-  </form>
-  <button class="secondary" id="switchBtn" type="button">إنشاء حساب جديد</button>
+  <h2>أهلاً بيك</h2>
+  <div class="desc" id="desc">سجّل دخولك برقم هاتفك حتى تتابع</div>
+
+  <section id="phoneSection">
+    <label for="phone">رقم الهاتف العراقي</label>
+    <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07XXXXXXXXX">
+    <div id="recaptcha-container"></div>
+    <button id="sendBtn" type="button">إرسال رمز التحقق</button>
+  </section>
+
+  <section id="codeSection" class="hidden">
+    <label for="otp">رمز التحقق المرسل برسالة SMS</label>
+    <input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="أدخل الرمز">
+    <button id="verifyBtn" type="button">تأكيد الرمز وتسجيل الدخول</button>
+    <button id="backBtn" type="button" class="secondary">تغيير رقم الهاتف</button>
+  </section>
+
   <div id="msg" role="status" aria-live="polite"></div>
 </div>
 
@@ -37,8 +50,8 @@ button:disabled{opacity:.65;cursor:wait}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  RecaptchaVerifier,
+  signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -54,77 +67,126 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-let isSignup = false;
+auth.languageCode = "ar";
 
-const form = document.getElementById("authForm");
-const msg = document.getElementById("msg");
-const mainBtn = document.getElementById("mainBtn");
-const switchBtn = document.getElementById("switchBtn");
-const passwordInput = document.getElementById("password");
+const $ = id => document.getElementById(id);
+const phoneSection = $("phoneSection");
+const codeSection = $("codeSection");
+const phoneInput = $("phone");
+const otpInput = $("otp");
+const sendBtn = $("sendBtn");
+const verifyBtn = $("verifyBtn");
+const backBtn = $("backBtn");
+const msg = $("msg");
 
-switchBtn.addEventListener("click", () => {
-  isSignup = !isSignup;
+let verifier = null;
+let confirmation = null;
+let widgetRendered = false;
 
-  document.getElementById("heading").textContent =
-    isSignup ? "إنشاء حساب جديد" : "أهلاً بيك";
-
-  document.getElementById("desc").textContent =
-    isSignup ? "أنشئ حسابك للبدء" : "سجّل دخولك حتى تتابع";
-
-  mainBtn.textContent = isSignup ? "إنشاء حساب" : "تسجيل الدخول";
-  switchBtn.textContent = isSignup ? "عندي حساب بالفعل" : "إنشاء حساب جديد";
-  passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
-  passwordInput.value = "";
-  msg.textContent = "";
-});
-
-function notifyMobizyLoginSuccess() {
-  // إشعار اختياري للصفحة الحاضنة؛ يحتاج مستقبلاً إلى
-  // كود استقبال داخل موبيزي حتى ينفّذ الانتقال إلى Vezash.
-  if (window.parent !== window) {
-    window.parent.postMessage(
-      { type: "VEZASH_LOGIN_SUCCESS" },
-      "*"
-    );
-  }
+function message(text, color = "") {
+  msg.textContent = text;
+  msg.style.color = color || "#ffcc80";
 }
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+function normalizePhone(value) {
+  let n = value.trim().replace(/[\s()-]/g, "");
+  if (n.startsWith("00")) n = "+" + n.slice(2);
+  if (n.startsWith("964")) n = "+" + n;
+  if (n.startsWith("07")) n = "+964" + n.slice(1);
+  if (n.startsWith("7")) n = "+964" + n;
 
-  const email = document.getElementById("email").value.trim();
-  const password = passwordInput.value;
+  if (!/^\+9647\d{9}$/.test(n)) {
+    throw new Error("أدخل رقمًا عراقيًا صحيحًا، مثل 07XXXXXXXXX");
+  }
+  return n;
+}
 
-  mainBtn.disabled = true;
-  mainBtn.textContent = "لحظة من فضلك...";
-  msg.textContent = "";
+function setupRecaptcha() {
+  if (verifier) return;
+  verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+    size: "normal",
+    callback: () => {},
+    "expired-callback": () => message("انتهت صلاحية التحقق. أعد المحاولة.")
+  });
+}
 
+function errorText(error) {
+  const errors = {
+    "auth/invalid-phone-number": "رقم الهاتف غير صحيح.",
+    "auth/too-many-requests": "محاولات كثيرة. انتظر قليلًا ثم حاول.",
+    "auth/quota-exceeded": "تم تجاوز حد رسائل التحقق المتاح.",
+    "auth/captcha-check-failed": "فشل التحقق. راجع إعدادات Firebase والنطاق.",
+    "auth/operation-not-allowed": "فعّل تسجيل الدخول بالهاتف في Firebase.",
+    "auth/unauthorized-domain": "نطاق الصفحة غير مسموح في Firebase.",
+    "auth/invalid-verification-code": "رمز التحقق غير صحيح.",
+    "auth/code-expired": "انتهت صلاحية الرمز. أرسل رمزًا جديدًا.",
+    "auth/network-request-failed": "تعذّر الاتصال بالإنترنت."
+  };
+  return errors[error.code] || "تعذّرت العملية: " + (error.code || error.message);
+}
+
+sendBtn.addEventListener("click", async () => {
+  sendBtn.disabled = true;
   try {
-    if (isSignup) {
-      await createUserWithEmailAndPassword(auth, email, password);
-      msg.textContent = "تم إنشاء الحساب بنجاح! تگدر هسة تسجّل دخولك.";
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-      msg.textContent = "تم تسجيل الدخول بنجاح!";
-      notifyMobizyLoginSuccess();
+    const phone = normalizePhone(phoneInput.value);
+    setupRecaptcha();
+
+    if (!widgetRendered) {
+      await verifier.render();
+      widgetRendered = true;
+    }
+
+    message("أكمل اختبار التحقق، ثم انتظر رسالة SMS.");
+    confirmation = await signInWithPhoneNumber(auth, phone, verifier);
+
+    phoneSection.classList.add("hidden");
+    codeSection.classList.remove("hidden");
+    message("تم إرسال رمز التحقق إلى " + phone, "#8eb5ff");
+    otpInput.focus();
+  } catch (error) {
+    console.error(error);
+    message(errorText(error));
+    sendBtn.disabled = false;
+  }
+});
+
+verifyBtn.addEventListener("click", async () => {
+  const code = otpInput.value.trim();
+  if (!confirmation) {
+    message("أرسل رمز التحقق أولًا.");
+    return;
+  }
+  if (!/^\d{6}$/.test(code)) {
+    message("أدخل رمز التحقق المكوّن من 6 أرقام.");
+    return;
+  }
+
+  verifyBtn.disabled = true;
+  try {
+    const result = await confirmation.confirm(code);
+    message("تم تسجيل الدخول بنجاح ✅", "#8eb5ff");
+
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        type: "VEZASH_LOGIN_SUCCESS",
+        uid: result.user.uid,
+        phoneNumber: result.user.phoneNumber
+      }, "*");
     }
   } catch (error) {
-    const errors = {
-      "auth/email-already-in-use": "هذا البريد مسجل مسبقاً. جرّب تسجيل الدخول.",
-      "auth/invalid-email": "البريد الإلكتروني غير صحيح.",
-      "auth/weak-password": "كلمة السر ضعيفة. استخدم 6 أحرف على الأقل.",
-      "auth/invalid-credential": "البريد أو كلمة السر غير صحيحة.",
-      "auth/network-request-failed": "تعذر الاتصال. تحقق من الإنترنت وحاول مجدداً.",
-      "auth/too-many-requests": "محاولات كثيرة. انتظر قليلاً ثم حاول مجدداً.",
-      "auth/operation-not-allowed": "تسجيل البريد الإلكتروني غير مفعّل في Firebase."
-    };
-
-    msg.textContent =
-      errors[error.code] || "تعذرت العملية. رمز الخطأ: " + error.code;
-  } finally {
-    mainBtn.disabled = false;
-    mainBtn.textContent = isSignup ? "إنشاء حساب" : "تسجيل الدخول";
+    console.error(error);
+    message(errorText(error));
+    verifyBtn.disabled = false;
   }
+});
+
+backBtn.addEventListener("click", () => {
+  confirmation = null;
+  otpInput.value = "";
+  codeSection.classList.add("hidden");
+  phoneSection.classList.remove("hidden");
+  sendBtn.disabled = false;
+  message("");
 });
 </script>
 </body>
