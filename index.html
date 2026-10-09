@@ -194,6 +194,34 @@ button:disabled{opacity:.48;cursor:not-allowed}
 .navbtn.active{background:#142c42;color:var(--cyan)}
 .footer{text-align:center;color:#637b98;font-size:10px;margin:25px 0 8px}
 .hidden{display:none!important}
+
+/* نافذة تسجيل الدخول */
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(7,17,31,0.85);backdrop-filter:blur(10px);
+  z-index:99;display:flex;align-items:center;justify-content:center;padding:16px
+}
+.modal{
+  background:linear-gradient(145deg,#13243a,#0e1b2e);
+  border:1px solid #29405b;border-radius:var(--radius);
+  padding:24px;width:100%;max-width:400px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);position:relative
+}
+.modal-close{
+  position:absolute;top:16px;left:16px;background:none;border:none;
+  color:var(--muted);font-size:20px;padding:0
+}
+.modal-title{font-size:20px;font-weight:850;margin-bottom:16px;text-align:center}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.form-control{
+  width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+  background:#0b1728;color:var(--text);font-size:14px;outline:none
+}
+.form-control:focus{border-color:var(--cyan)}
+.auth-switch{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}
+.auth-switch button{color:var(--cyan);background:none;border:none;padding:0;font-weight:700}
+
 @media(max-width:370px){
   .app{padding-left:12px;padding-right:12px}
   .ring{width:180px;height:180px}
@@ -276,8 +304,8 @@ button:disabled{opacity:.48;cursor:not-allowed}
       </div>
       <div class="quick">
         <div class="quick-icon">🛡️</div>
-        <strong>حساب بدون تسجيل</strong>
-        <span>ندخلك تلقائياً بدون بريد أو رقم هاتف.</span>
+        <strong>تسجيل الدخول</strong>
+        <span>احفظ نقاطك بحساب بريد إلكتروني.</span>
       </div>
     </div>
   </section>
@@ -329,6 +357,34 @@ button:disabled{opacity:.48;cursor:not-allowed}
 <div class="footer">VEZASH © <span id="year"></span> • إصدار تجريبي</div>
 </div>
 
+<!-- نافذة تسجيل الدخول بـ Firebase -->
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal">
+    <button class="modal-close" id="closeAuthModal">✕</button>
+    <div class="modal-title" id="authTitle">تسجيل الدخول</div>
+    
+    <div class="form-group">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="authEmail" class="form-control" placeholder="example@gmail.com">
+    </div>
+    
+    <div class="form-group">
+      <label>كلمة السر</label>
+      <input type="password" id="authPassword" class="form-control" placeholder="******">
+    </div>
+
+    <button class="primary" id="authSubmitBtn" style="margin-top:10px">دخول</button>
+    <button class="ghost hidden" id="signOutBtn" style="margin-top:10px">تسجيل الخروج</button>
+
+    <div class="status" id="authStatus"></div>
+
+    <div class="auth-switch" id="authSwitchContainer">
+      <span id="authSwitchText">ليس لديك حساب؟</span>
+      <button id="toggleAuthMode">إنشاء حساب جديد</button>
+    </div>
+  </div>
+</div>
+
 <nav class="bottomnav" aria-label="التنقل الرئيسي">
   <div class="navinner">
     <button class="navbtn active" data-page="home">
@@ -350,6 +406,11 @@ import { initializeApp }
 import {
   getAuth,
   signInAnonymously,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  linkWithCredential,
+  EmailAuthProvider,
+  signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
@@ -364,8 +425,6 @@ import {
   httpsCallable
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-functions.js";
 
-// إعدادات مشروع VEZASH الحالية.
-// لا تضع مفاتيح Admin أو Service Account داخل هذا الملف.
 const firebaseConfig = {
   apiKey: "AIzaSyCVg6fylaZjhgtAl_h_LNIOpExpBa0FZ21g",
   authDomain: "vezash.firebaseapp.com",
@@ -421,6 +480,7 @@ let userData = null;
 let unsub = null;
 let busy = false;
 let tick = null;
+let isSignUpMode = false;
 
 const fmt = n => new Intl.NumberFormat("ar-IQ").format(Number(n || 0));
 
@@ -656,7 +716,7 @@ async function perform(fn, args, success) {
     status(
       messages[code] ||
       error?.message ||
-      "تعذّر إتمام العملية. تأكد من نشر وظائف Firebase وقواعد الأمان.",
+      "تعذّر إتمام العملية.",
       "error"
     );
   } finally {
@@ -702,80 +762,170 @@ document.querySelectorAll("[data-page]").forEach(button => {
   });
 });
 
+/* إدارة تسجيل الدخول والبريد الإلكتروني */
 $("profileBtn").addEventListener("click", () => {
-  alert(
-    "حسابك مجهول ومحفوظ على هذا الجهاز. إذا حذفت بيانات التطبيق " +
-    "أو بدّلت الجهاز فقد تفقد إمكانية الوصول للحساب؛ سنضيف ربط الحساب لاحقاً إذا احتجته."
-  );
+  $("authModal").classList.remove("hidden");
+  
+  if (currentUser && !currentUser.isAnonymous) {
+    $("authTitle").textContent = "حسابك الحالي";
+    $("authEmail").value = currentUser.email || "";
+    $("authEmail").disabled = true;
+    $("authPassword").closest(".form-group").style.display = "none";
+    $("authSubmitBtn").classList.add("hidden");
+    $("signOutBtn").classList.remove("hidden");
+    $("authSwitchContainer").classList.add("hidden");
+  } else {
+    resetAuthModalUI();
+  }
+});
+
+$("closeAuthModal").addEventListener("click", () => {
+  $("authModal").classList.add("hidden");
+});
+
+function resetAuthModalUI() {
+  $("authEmail").value = "";
+  $("authEmail").disabled = false;
+  $("authPassword").value = "";
+  $("authPassword").closest(".form-group").style.display = "block";
+  $("authSubmitBtn").classList.remove("hidden");
+  $("signOutBtn").classList.add("hidden");
+  $("authSwitchContainer").classList.remove("hidden");
+  $("authStatus").textContent = "";
+  
+  if (isSignUpMode) {
+    $("authTitle").textContent = "إنشاء حساب جديد";
+    $("authSubmitBtn").textContent = "حفظ وربط الحساب";
+    $("authSwitchText").textContent = "لديك حساب بالفعل؟";
+    $("toggleAuthMode").textContent = "تسجيل الدخول";
+  } else {
+    $("authTitle").textContent = "تسجيل الدخول";
+    $("authSubmitBtn").textContent = "دخول";
+    $("authSwitchText").textContent = "ليس لديك حساب؟";
+    $("toggleAuthMode").textContent = "إنشاء حساب جديد";
+  }
+}
+
+$("toggleAuthMode").addEventListener("click", () => {
+  isSignUpMode = !isSignUpMode;
+  resetAuthModalUI();
+});
+
+$("authSubmitBtn").addEventListener("click", async () => {
+  const email = $("authEmail").value.trim();
+  const password = $("authPassword").value.trim();
+  const authStatus = $("authStatus");
+
+  if (!email || !password) {
+    authStatus.textContent = "يرجى كتابة البريد الإلكتروني وكلمة السر.";
+    authStatus.className = "status error";
+    return;
+  }
+
+  authStatus.textContent = "جاري المعالجة…";
+  authStatus.className = "status";
+
+  try {
+    if (isSignUpMode) {
+      if (currentUser && currentUser.isAnonymous) {
+        // ربط الحساب المؤقت بالبريد والكلمة الجديدة حتى لا تضيع البيانات
+        const credential = EmailAuthProvider.credential(email, password);
+        await linkWithCredential(currentUser, credential);
+        authStatus.textContent = "تم ربط الحساب وحفظ نقاطك بنجاح!";
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+        authStatus.textContent = "تم إنشاء الحساب بنجاح!";
+      }
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+      authStatus.textContent = "تم تسجيل الدخول بنجاح!";
+    }
+    
+    authStatus.className = "status ok";
+    setTimeout(() => {
+      $("authModal").classList.add("hidden");
+    }, 1200);
+
+  } catch (error) {
+    console.error(error);
+    let msg = "حدث خطأ أثناء العملية.";
+    if (error.code === "auth/email-already-in-use") msg = "البريد الإلكتروني مستخدم بالفعل.";
+    if (error.code === "auth/invalid-email") msg = "البريد الإلكتروني غير صالحة صيغته.";
+    if (error.code === "auth/weak-password") msg = "كلمة السر ضعيفة (يجب أن تكون 6 أحرف على الأقل).";
+    if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found" || error.code === "auth/invalid-credential") msg = "البريد الإلكتروني أو كلمة السر غير صحيحة.";
+    
+    authStatus.textContent = msg;
+    authStatus.className = "status error";
+  }
+});
+
+$("signOutBtn").addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    $("authModal").classList.add("hidden");
+    await signInAnonymously(auth);
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 $("year").textContent = new Date().getFullYear();
 
 async function start() {
-  try {
-    await signInAnonymously(auth);
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      // إذا لم يكن هنالك مستخدم متاح، قم بالدخول المجهول كخيار افتراضي
+      signInAnonymously(auth).catch(console.error);
+      return;
+    }
 
-    onAuthStateChanged(auth, user => {
-      if (!user) return;
+    currentUser = user;
 
-      currentUser = user;
+    if (unsub) unsub();
 
-      if (unsub) unsub();
+    unsub = onValue(
+      ref(db, "users/" + user.uid),
+      snapshot => {
+        userData = snapshot.val() || {
+          points: 0,
+          coins: 0,
+          lastClaim: 0,
+          meters: { basic: true },
+          history: {}
+        };
 
-      unsub = onValue(
-        ref(db, "users/" + user.uid),
-        snapshot => {
-          userData = snapshot.val() || {
-            points: 0,
-            coins: 0,
-            lastClaim: 0,
-            meters: { basic: true },
-            history: {}
-          };
-
-          if (!userData.meters) {
-            userData.meters = { basic: true };
-          }
-
-          if (!userData.meters.basic) {
-            userData.meters.basic = true;
-          }
-
-          render();
-
-          setConnection(
-            "<strong>تم الاتصال بـ VEZASH</strong><br>" +
-            "حساب مجهول جاهز. حافظ على بيانات التطبيق حتى لا تفقد الوصول إلى حسابك.",
-            false
-          );
-        },
-        error => {
-          console.error(error);
-
-          setConnection(
-            "<strong>تعذّر تحميل الرصيد</strong><br>" +
-            "تحقق من قواعد قراءة Firebase.",
-            true
-          );
-
-          status("تعذّر تحميل بياناتك.", "error");
+        if (!userData.meters) {
+          userData.meters = { basic: true };
         }
-      );
-    });
-  } catch (error) {
-    console.error(error);
 
-    setConnection(
-      "<strong>تعذّر الاتصال</strong><br>" +
-      "فعّل Anonymous Authentication وتأكد من إعدادات Firebase.",
-      true
-    );
+        if (!userData.meters.basic) {
+          userData.meters.basic = true;
+        }
 
-    status(
-      "تعذّر تسجيل الدخول المجهول. راجع إعدادات Firebase Authentication.",
-      "error"
+        render();
+
+        const isAnon = user.isAnonymous;
+        setConnection(
+          `<strong>${isAnon ? "حساب مجهول (مؤقت)" : "تم تسجيل الدخول بحسابك"}</strong><br>` +
+          (isAnon 
+            ? "حافظ على حسابك عبر ربطه بريد إلكتروني من أيقونة أعلى الصفحة (✦)."
+            : `البريد: ${user.email}`),
+          false
+        );
+      },
+      error => {
+        console.error(error);
+
+        setConnection(
+          "<strong>تعذّر تحميل الرصيد</strong><br>" +
+          "تحقق من قواعد قراءة Firebase.",
+          true
+        );
+
+        status("تعذّر تحميل بياناتك.", "error");
+      }
     );
-  }
+  });
 }
 
 start();
