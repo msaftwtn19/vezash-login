@@ -3,191 +3,171 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vezash - تسجيل الدخول</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Vezash - النقاط والعملات</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#101522;color:white;font-family:Arial,sans-serif}
-.card{width:100%;max-width:380px;padding:28px 22px;background:#1b2335;border:1px solid #303b52;border-radius:22px;text-align:center}
-.logo{width:68px;height:68px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:#3478f6;border-radius:20px;font-size:30px;font-weight:bold}
-h2{margin:0 0 10px;font-size:25px}
-.desc{color:#aeb9cc;font-size:14px;margin-bottom:25px;line-height:1.7}
-label{display:block;text-align:right;margin:12px 0 8px;color:#d9e2f2;font-size:14px}
-input{width:100%;padding:15px;margin-bottom:13px;background:#111827;border:1px solid #39445b;border-radius:12px;color:white;font-size:16px;outline:none;direction:ltr;text-align:left}
-input:focus{border-color:#3478f6}
-button{width:100%;padding:15px;border:0;border-radius:12px;background:#3478f6;color:white;font-size:16px;font-weight:bold;cursor:pointer;margin-top:5px}
-button:disabled{opacity:.65;cursor:wait}
-.secondary{background:transparent;color:#8eb5ff;margin-top:12px;border:1px solid #39445b}
-#msg{font-size:14px;color:#ffcc80;margin-top:16px;line-height:1.8;overflow-wrap:anywhere}
-#recaptcha-container{display:flex;justify-content:center;margin:12px 0;overflow:hidden}
-.hidden{display:none!important}
+body{
+ margin:0;font-family:Arial,sans-serif;background:#0b1120;
+ color:#fff;min-height:100vh;padding:20px 14px;
+}
+main{max-width:480px;margin:auto}
+header{text-align:center;padding:20px 0 25px}
+.logo{font-size:34px;font-weight:900;letter-spacing:2px;color:#62e6c4}
+header p{color:#9eabc0;margin-top:8px}
+.card{
+ background:#141f32;border:1px solid #28364d;
+ border-radius:20px;padding:20px;margin-bottom:15px;
+}
+h2{font-size:19px;margin:0 0 17px}
+.balances{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.balance{background:#1d2a40;border-radius:15px;padding:16px 10px;text-align:center}
+.balance span{display:block;color:#aebbd0;font-size:14px;margin-bottom:10px}
+.balance strong{font-size:27px;color:#62e6c4}
+.balance.coins strong{color:#ffd166}
+button{
+ border:0;border-radius:12px;padding:14px 12px;
+ font-size:16px;font-weight:bold;cursor:pointer;width:100%;
+ background:#62e6c4;color:#102033;margin-top:12px;
+}
+button.secondary{background:#273750;color:white}
+button:disabled{opacity:.45;cursor:not-allowed}
+.info{color:#aebbd0;font-size:13px;line-height:1.8;margin:12px 0 0}
+.status{margin-top:13px;font-size:14px;line-height:1.8;color:#62e6c4}
+.product{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.product button{width:auto;min-width:112px;margin:0}
+.product small{display:block;color:#aebbd0;margin-top:7px}
+#message{min-height:24px;text-align:center;font-size:14px;line-height:1.8}
+footer{text-align:center;color:#76849b;font-size:12px;padding:10px}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">V</div>
-  <h2>أهلاً بيك</h2>
-  <div class="desc" id="desc">سجّل دخولك برقم هاتفك حتى تتابع</div>
+<main>
+<header>
+ <div class="logo">VEZASH</div>
+ <p>اجمع نقاطك واستبدلها بالعملات</p>
+</header>
 
-  <section id="phoneSection">
-    <label for="phone">رقم الهاتف العراقي</label>
-    <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07XXXXXXXXX">
-    <div id="recaptcha-container"></div>
-    <button id="sendBtn" type="button">إرسال رمز التحقق</button>
-  </section>
+<section class="card">
+ <h2>رصيدك</h2>
+ <div class="balances">
+  <div class="balance">
+   <span>⭐ النقاط</span>
+   <strong id="points">0</strong>
+  </div>
+  <div class="balance coins">
+   <span>🪙 العملات</span>
+   <strong id="coins">0</strong>
+  </div>
+ </div>
+</section>
 
-  <section id="codeSection" class="hidden">
-    <label for="otp">رمز التحقق المرسل برسالة SMS</label>
-    <input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="أدخل الرمز">
-    <button id="verifyBtn" type="button">تأكيد الرمز وتسجيل الدخول</button>
-    <button id="backBtn" type="button" class="secondary">تغيير رقم الهاتف</button>
-  </section>
+<section class="card">
+ <h2>🎁 المكافأة اليومية</h2>
+ <p class="info">احصل على 10 نقاط مرة كل 24 ساعة.</p>
+ <button id="claimBtn" onclick="claimReward()">استلام المكافأة</button>
+ <div id="timer" class="status"></div>
+</section>
 
-  <div id="msg" role="status" aria-live="polite"></div>
-</div>
+<section class="card">
+ <h2>🛍️ متجر العملات</h2>
+ <div class="product">
+  <div>
+   <strong>10 عملات 🪙</strong>
+   <small>السعر: 100 نقطة ⭐</small>
+  </div>
+  <button onclick="buyCoins()">شراء</button>
+ </div>
+ <p class="info">اجمع النقاط اليومية حتى تقدر تشتري العملات.</p>
+</section>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getAuth,
-  RecaptchaVerifier,
-  signInWithPhoneNumber
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+<div id="message" role="status" aria-live="polite"></div>
+<footer>VEZASH ©</footer>
+</main>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCVg6fylaZjhgtAlh_LNIOpExpBa0FZ21g",
-  authDomain: "vezash.firebaseapp.com",
-  databaseURL: "https://vezash-default-rtdb.firebaseio.com",
-  projectId: "vezash",
-  storageBucket: "vezash.firebasestorage.app",
-  messagingSenderId: "1069891769244",
-  appId: "1:1069891769244:web:1056f47de64789c1406e59",
-  measurementId: "G-02CRNVKKEL"
+<script>
+const REWARD_POINTS = 10;
+const WAIT_MS = 24 * 60 * 60 * 1000;
+const PRICE_POINTS = 100;
+const REWARD_COINS = 10;
+
+const KEYS = {
+ points: "vezash_points",
+ coins: "vezash_coins",
+ lastClaim: "vezash_last_claim"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-auth.languageCode = "ar";
-
-const $ = id => document.getElementById(id);
-const phoneSection = $("phoneSection");
-const codeSection = $("codeSection");
-const phoneInput = $("phone");
-const otpInput = $("otp");
-const sendBtn = $("sendBtn");
-const verifyBtn = $("verifyBtn");
-const backBtn = $("backBtn");
-const msg = $("msg");
-
-let verifier = null;
-let confirmation = null;
-let widgetRendered = false;
-
-function message(text, color = "") {
-  msg.textContent = text;
-  msg.style.color = color || "#ffcc80";
+function getNumber(key) {
+ const value = Number(localStorage.getItem(key) || 0);
+ return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
-function normalizePhone(value) {
-  let n = value.trim().replace(/[\s()-]/g, "");
-  if (n.startsWith("00")) n = "+" + n.slice(2);
-  if (n.startsWith("964")) n = "+" + n;
-  if (n.startsWith("07")) n = "+964" + n.slice(1);
-  if (n.startsWith("7")) n = "+964" + n;
-
-  if (!/^\+9647\d{9}$/.test(n)) {
-    throw new Error("أدخل رقمًا عراقيًا صحيحًا، مثل 07XXXXXXXXX");
-  }
-  return n;
+function showMessage(text) {
+ document.getElementById("message").textContent = text;
 }
 
-function setupRecaptcha() {
-  if (verifier) return;
-  verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-    size: "normal",
-    callback: () => {},
-    "expired-callback": () => message("انتهت صلاحية التحقق. أعد المحاولة.")
-  });
+function render() {
+ document.getElementById("points").textContent = getNumber(KEYS.points);
+ document.getElementById("coins").textContent = getNumber(KEYS.coins);
+ updateTimer();
 }
 
-function errorText(error) {
-  const errors = {
-    "auth/invalid-phone-number": "رقم الهاتف غير صحيح.",
-    "auth/too-many-requests": "محاولات كثيرة. انتظر قليلًا ثم حاول.",
-    "auth/quota-exceeded": "تم تجاوز حد رسائل التحقق المتاح.",
-    "auth/captcha-check-failed": "فشل التحقق. راجع إعدادات Firebase والنطاق.",
-    "auth/operation-not-allowed": "فعّل تسجيل الدخول بالهاتف في Firebase.",
-    "auth/unauthorized-domain": "نطاق الصفحة غير مسموح في Firebase.",
-    "auth/invalid-verification-code": "رمز التحقق غير صحيح.",
-    "auth/code-expired": "انتهت صلاحية الرمز. أرسل رمزًا جديدًا.",
-    "auth/network-request-failed": "تعذّر الاتصال بالإنترنت."
-  };
-  return errors[error.code] || "تعذّرت العملية: " + (error.code || error.message);
+function claimReward() {
+ const now = Date.now();
+ const last = getNumber(KEYS.lastClaim);
+
+ if (last > 0 && now - last < WAIT_MS) {
+  showMessage("استلمت مكافأتك مسبقاً. انتظر انتهاء الوقت.");
+  updateTimer();
+  return;
+ }
+
+ localStorage.setItem(KEYS.points, getNumber(KEYS.points) + REWARD_POINTS);
+ localStorage.setItem(KEYS.lastClaim, now);
+ showMessage("مبروك! حصلت على 10 نقاط ⭐");
+ render();
 }
 
-sendBtn.addEventListener("click", async () => {
-  sendBtn.disabled = true;
-  try {
-    const phone = normalizePhone(phoneInput.value);
-    setupRecaptcha();
+function buyCoins() {
+ const points = getNumber(KEYS.points);
 
-    if (!widgetRendered) {
-      await verifier.render();
-      widgetRendered = true;
-    }
+ if (points < PRICE_POINTS) {
+  showMessage("نقاطك ما تكفي. تحتاج 100 نقطة للشراء.");
+  return;
+ }
 
-    message("أكمل اختبار التحقق، ثم انتظر رسالة SMS.");
-    confirmation = await signInWithPhoneNumber(auth, phone, verifier);
+ localStorage.setItem(KEYS.points, points - PRICE_POINTS);
+ localStorage.setItem(KEYS.coins, getNumber(KEYS.coins) + REWARD_COINS);
+ showMessage("تم الشراء! أضفنا 10 عملات إلى رصيدك 🪙");
+ render();
+}
 
-    phoneSection.classList.add("hidden");
-    codeSection.classList.remove("hidden");
-    message("تم إرسال رمز التحقق إلى " + phone, "#8eb5ff");
-    otpInput.focus();
-  } catch (error) {
-    console.error(error);
-    message(errorText(error));
-    sendBtn.disabled = false;
-  }
-});
+function updateTimer() {
+ const last = getNumber(KEYS.lastClaim);
+ const btn = document.getElementById("claimBtn");
+ const timer = document.getElementById("timer");
 
-verifyBtn.addEventListener("click", async () => {
-  const code = otpInput.value.trim();
-  if (!confirmation) {
-    message("أرسل رمز التحقق أولًا.");
-    return;
-  }
-  if (!/^\d{6}$/.test(code)) {
-    message("أدخل رمز التحقق المكوّن من 6 أرقام.");
-    return;
-  }
+ if (!last || Date.now() - last >= WAIT_MS) {
+  btn.disabled = false;
+  btn.textContent = "استلام المكافأة";
+  timer.textContent = "مكافأتك اليومية جاهزة!";
+  return;
+ }
 
-  verifyBtn.disabled = true;
-  try {
-    const result = await confirmation.confirm(code);
-    message("تم تسجيل الدخول بنجاح ✅", "#8eb5ff");
+ btn.disabled = true;
+ btn.textContent = "المكافأة غير متاحة حالياً";
 
-    if (window.parent !== window) {
-      window.parent.postMessage({
-        type: "VEZASH_LOGIN_SUCCESS",
-        uid: result.user.uid,
-        phoneNumber: result.user.phoneNumber
-      }, "*");
-    }
-  } catch (error) {
-    console.error(error);
-    message(errorText(error));
-    verifyBtn.disabled = false;
-  }
-});
+ const remaining = WAIT_MS - (Date.now() - last);
+ const hours = Math.floor(remaining / 3600000);
+ const minutes = Math.floor((remaining % 3600000) / 60000);
+ const seconds = Math.floor((remaining % 60000) / 1000);
 
-backBtn.addEventListener("click", () => {
-  confirmation = null;
-  otpInput.value = "";
-  codeSection.classList.add("hidden");
-  phoneSection.classList.remove("hidden");
-  sendBtn.disabled = false;
-  message("");
-});
+ timer.textContent = `المكافأة القادمة بعد: ${hours} ساعة و${minutes} دقيقة و${seconds} ثانية`;
+}
+
+render();
+setInterval(updateTimer, 1000);
 </script>
 </body>
 </html>
