@@ -11,7 +11,6 @@
   padding: 0;
   font-family: system-ui, -apple-system, sans-serif;
 }
-
 body {
   background-color: #0b0b0e;
   color: #f0f0f0;
@@ -21,34 +20,29 @@ body {
   align-items: center;
   padding: 16px;
 }
-
 .auth-card {
   width: 100%;
   max-width: 380px;
   background: #141419;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.4);
   border-radius: 20px;
   padding: 24px 20px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
 }
-
 .brand {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
-
 .brand h1 {
   color: #d4af37;
   font-size: 24px;
   font-weight: 800;
   margin-bottom: 4px;
 }
-
 .brand p {
   color: #888890;
   font-size: 13px;
 }
-
 .nav-tabs {
   display: flex;
   background: #09090c;
@@ -57,7 +51,6 @@ body {
   margin-bottom: 20px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .tab {
   flex: 1;
   background: transparent;
@@ -69,18 +62,14 @@ body {
   cursor: pointer;
   border-radius: 9px;
   text-align: center;
-  transition: 0.2s;
 }
-
 .tab.active {
   background: #d4af37;
   color: #0b0b0e;
 }
-
 .field {
   margin-bottom: 14px;
 }
-
 .field label {
   display: block;
   font-size: 12px;
@@ -88,7 +77,6 @@ body {
   margin-bottom: 6px;
   font-weight: 600;
 }
-
 .input-box {
   width: 100%;
   padding: 12px 14px;
@@ -99,11 +87,9 @@ body {
   font-size: 14px;
   outline: none;
 }
-
 .input-box:focus {
   border-color: #d4af37;
 }
-
 .action-btn {
   width: 100%;
   padding: 14px;
@@ -116,7 +102,6 @@ body {
   cursor: pointer;
   margin-top: 10px;
 }
-
 .status-text {
   text-align: center;
   font-size: 13px;
@@ -124,27 +109,22 @@ body {
   font-weight: 700;
   min-height: 18px;
 }
-
-.status-text.err { color: #ff5555; }
-.status-text.ok { color: #44ff88; }
-
+.err { color: #ff5555; }
+.ok { color: #44ff88; }
 .dashboard {
   text-align: center;
   padding: 10px 0;
 }
-
 .dashboard h2 {
   color: #d4af37;
   font-size: 20px;
   margin-bottom: 8px;
 }
-
 .dashboard p {
   color: #a0a0a5;
   font-size: 14px;
   margin-bottom: 20px;
 }
-
 .out-btn {
   background: transparent;
   border: 1px solid #ff5555;
@@ -168,8 +148,8 @@ body {
     </div>
 
     <div class="nav-tabs">
-      <button class="tab active" id="tLogin" onclick="changeMode('login')">تسجيل دخول</button>
-      <button class="tab" id="tRegister" onclick="changeMode('register')">حساب جديد</button>
+      <button class="tab active" id="tLogin" onclick="switchTab('login')">تسجيل دخول</button>
+      <button class="tab" id="tRegister" onclick="switchTab('register')">حساب جديد</button>
     </div>
 
     <!-- فورم الدخول -->
@@ -182,7 +162,7 @@ body {
         <label>كلمة المرور</label>
         <input type="password" id="lPass" class="input-box" placeholder="••••••••">
       </div>
-      <button class="action-btn" onclick="doLogin()">تسجيل الدخول</button>
+      <button class="action-btn" onclick="executeLogin()">تسجيل الدخول</button>
     </div>
 
     <!-- فورم التسجيل -->
@@ -199,38 +179,43 @@ body {
         <label>كلمة المرور</label>
         <input type="password" id="rPass" class="input-box" placeholder="••••••••">
       </div>
-      <button class="action-btn" onclick="doRegister()">إنشاء الحساب</button>
+      <button class="action-btn" onclick="executeRegister()">إنشاء الحساب</button>
     </div>
 
     <div class="status-text" id="feedback"></div>
   </div>
 
-  <!-- لوحة معلومات المستخدم بعد الدخول -->
+  <!-- لوحة معلومات المستخدم -->
   <div id="userView" style="display: none;" class="dashboard">
     <h2>أهلاً بك مجدداً 🔥</h2>
     <p id="loggedUserEmail"></p>
-    <button class="out-btn" onclick="doLogout()">تسجيل الخروج</button>
+    <button class="out-btn" onclick="executeLogout()">تسجيل الخروج</button>
   </div>
 
 </div>
 
 <script>
-const SESSION_KEY = 'vezash_github_session';
+// دوال التنفيذ المباشر المتوافقة 100% مع بيئة موبيزي وغيت هاب
+const KEY = 'vezash_app_user';
 
-function initApp() {
-  const sessionData = localStorage.getItem(SESSION_KEY);
-  if (sessionData) {
-    const user = JSON.parse(sessionData);
-    document.getElementById('guestView').style.display = 'none';
-    document.getElementById('userView').style.display = 'block';
-    document.getElementById('loggedUserEmail').textContent = user.email;
+function refreshState() {
+  const data = localStorage.getItem(KEY);
+  if (data) {
+    try {
+      const user = JSON.parse(data);
+      document.getElementById('guestView').style.display = 'none';
+      document.getElementById('userView').style.display = 'block';
+      document.getElementById('loggedUserEmail').textContent = user.email || user.name;
+    } catch(e) {
+      localStorage.removeItem(KEY);
+    }
   } else {
     document.getElementById('guestView').style.display = 'block';
     document.getElementById('userView').style.display = 'none';
   }
 }
 
-function changeMode(mode) {
+function switchTab(mode) {
   const tLogin = document.getElementById('tLogin');
   const tRegister = document.getElementById('tRegister');
   const boxLogin = document.getElementById('boxLogin');
@@ -238,62 +223,63 @@ function changeMode(mode) {
   document.getElementById('feedback').textContent = '';
 
   if (mode === 'login') {
-    tLogin.classList.add('active');
-    tRegister.classList.remove('active');
+    tLogin.className = 'tab active';
+    tRegister.className = 'tab';
     boxLogin.style.display = 'block';
     boxRegister.style.display = 'none';
   } else {
-    tRegister.classList.add('active');
-    tLogin.classList.remove('active');
+    tRegister.className = 'tab active';
+    tLogin.className = 'tab';
     boxRegister.style.display = 'block';
     boxLogin.style.display = 'none';
   }
 }
 
-function showMsg(text, type) {
-  const fb = document.getElementById('feedback');
-  fb.textContent = text;
-  fb.className = 'status-text ' + type;
-}
-
-function doLogin() {
+function executeLogin() {
   const email = document.getElementById('lEmail').value.trim();
   const pass = document.getElementById('lPass').value.trim();
+  const fb = document.getElementById('feedback');
 
   if (!email || !pass) {
-    showMsg('يرجى ملء جميع الحقول', 'err');
+    fb.className = 'status-text err';
+    fb.textContent = 'يرجى ملء جميع الحقول المطلوبة';
     return;
   }
 
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ email: email }));
-  showMsg('تم تسجيل الدخول بنجاح', 'ok');
-  setTimeout(initApp, 400);
+  localStorage.setItem(KEY, JSON.stringify({ email: email }));
+  fb.className = 'status-text ok';
+  fb.textContent = 'تم تسجيل الدخول بنجاح!';
+  setTimeout(refreshState, 300);
 }
 
-function doRegister() {
+function executeRegister() {
   const name = document.getElementById('rName').value.trim();
   const email = document.getElementById('rEmail').value.trim();
   const pass = document.getElementById('rPass').value.trim();
+  const fb = document.getElementById('feedback');
 
   if (!name || !email || !pass) {
-    showMsg('يرجى ملء كافة الحقول المطلوبة', 'err');
+    fb.className = 'status-text err';
+    fb.textContent = 'يرجى ملء كافة الحقول لإنشاء الحساب';
     return;
   }
 
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ name: name, email: email }));
-  showMsg('تم إنشاء الحساب بنجاح', 'ok');
-  setTimeout(initApp, 400);
+  localStorage.setItem(KEY, JSON.stringify({ name: name, email: email }));
+  fb.className = 'status-text ok';
+  fb.textContent = 'تم إنشاء الحساب بنجاح!';
+  setTimeout(refreshState, 300);
 }
 
-function doLogout() {
-  localStorage.removeItem(SESSION_KEY);
+function executeLogout() {
+  localStorage.removeItem(KEY);
   document.getElementById('lEmail').value = '';
   document.getElementById('lPass').value = '';
   document.getElementById('feedback').textContent = '';
-  initApp();
+  refreshState();
 }
 
-window.onload = initApp;
+// التشغيل المباشر الفوري عند قراءة الصفحة
+refreshState();
 </script>
 
 </body>
