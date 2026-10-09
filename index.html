@@ -8,9 +8,8 @@
 <style>
 :root {
   --bg: #0a0a0c;
-  --card-bg: rgba(18, 18, 22, 0.9);
+  --card-bg: rgba(18, 18, 22, 0.95);
   --gold: #d4af37;
-  --gold-glow: #ffd700;
   --text: #f0f0f0;
   --muted: #a0a0a0;
   --danger: #ff5555;
@@ -41,10 +40,9 @@ body {
   gap: 20px;
 }
 
-/* بطاقة تسجيل الدخول علوياً */
-.card-auth {
+.card-auth, .card-timer {
   background: var(--card-bg);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.4);
   border-radius: 20px;
   padding: 20px;
   backdrop-filter: blur(10px);
@@ -75,7 +73,7 @@ body {
   padding: 12px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   color: var(--text);
   font-size: 14px;
   outline: none;
@@ -87,7 +85,7 @@ body {
 
 .btn-auth {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--gold), #997a15);
@@ -102,22 +100,17 @@ body {
 
 .auth-status {
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 10px;
   min-height: 18px;
+  font-weight: 700;
 }
 .auth-status.error { color: var(--danger); }
 .auth-status.ok { color: var(--green); }
 
-/* بطاقة العداد والزر */
 .card-timer {
-  background: var(--card-bg);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 24px;
-  padding: 30px 20px;
   text-align: center;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+  padding: 30px 20px;
 }
 
 .points-badge {
@@ -138,7 +131,6 @@ body {
   letter-spacing: 2px;
   color: var(--text);
   margin: 15px 0;
-  text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
 }
 
 .btn-claim {
@@ -152,7 +144,6 @@ body {
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-  transition: all 0.2s ease;
 }
 
 .btn-claim:disabled {
@@ -175,9 +166,9 @@ body {
 
 <div class="container">
 
-  <!-- مربع تسجيل الدخول العلوي -->
-  <div class="card-auth" id="authBox">
-    <div class="auth-title" id="authTitle">تسجيل الدخول الحساب</div>
+  <!-- مربع تسجيل الدخول -->
+  <div class="card-auth">
+    <div class="auth-title" id="authTitle">تسجيل الدخول</div>
     
     <div id="authFields">
       <div class="input-group">
@@ -190,38 +181,34 @@ body {
         <input type="password" id="password" class="input-control" placeholder="******">
       </div>
 
-      <button class="btn-auth" id="loginBtn">حفظ الدخول</button>
+      <button type="button" class="btn-auth" id="loginBtn">حفظ ودخول</button>
     </div>
 
     <div class="auth-status" id="authStatus"></div>
     <div class="user-info" id="userInfo" style="display:none;"></div>
   </div>
 
-  <!-- مربع العداد والزر -->
+  <!-- مربع العداد -->
   <div class="card-timer">
     <div class="points-badge">⭐ رصيدك: <span id="userPoints">0</span> نقطة</div>
-    
     <div style="font-size: 13px; color: var(--muted);">الوقت المتبقي للمكافأة القادمة:</div>
     <div class="timer-display" id="timer">24:00:00</div>
-
-    <button class="btn-claim" id="claimBtn" disabled>استلام المكافأة اليومية</button>
+    <button type="button" class="btn-claim" id="claimBtn" disabled>استلام المكافأة اليومية</button>
   </div>
 
 </div>
 
 <script>
-const DAY_MS = 24 * 60 * 60 * 1000; // 24 ساعة
-
+const DAY_MS = 24 * 60 * 60 * 1000;
 const $ = id => document.getElementById(id);
 
-// استرجاع البيانات المحفوظة محلياً
-let userData = JSON.parse(localStorage.getItem('vezash_user')) || {
+let userData = JSON.parse(localStorage.getItem('vezash_user_v2')) || {
   email: '',
   points: 0,
   lastClaim: 0
 };
 
-// التحقق من حالة تسجيل الدخول السابقة
+// فحص الحالة عند التحميل
 if (userData.email) {
   $("authTitle").textContent = "حسابك مفعّل 🔐";
   $("authFields").style.display = "none";
@@ -229,22 +216,22 @@ if (userData.email) {
   $("userInfo").innerHTML = `مرحباً بك<br><strong>${userData.email}</strong>`;
 }
 
-// زر تسجيل الدخول
+// استجابة زر الدخول بشكل مؤكد
 $("loginBtn").addEventListener("click", () => {
-  const email = $("email").value.trim();
-  const password = $("password").value.trim();
+  const emailVal = $("email").value.trim();
+  const passVal = $("password").value.trim();
   const status = $("authStatus");
 
-  if (!email || !password) {
+  if (!emailVal || !passVal) {
     status.textContent = "يرجى كتابة البريد وكلمة السر.";
     status.className = "auth-status error";
     return;
   }
 
-  userData.email = email;
-  localStorage.setItem('vezash_user', JSON.stringify(userData));
+  userData.email = emailVal;
+  localStorage.setItem('vezash_user_v2', JSON.stringify(userData));
 
-  status.textContent = "تم حفظ الحساب بنجاح!";
+  status.textContent = "تم الحفظ بنجاح!";
   status.className = "auth-status ok";
 
   setTimeout(() => {
@@ -252,22 +239,22 @@ $("loginBtn").addEventListener("click", () => {
     $("authFields").style.display = "none";
     $("userInfo").style.display = "block";
     $("userInfo").innerHTML = `مرحباً بك<br><strong>${userData.email}</strong>`;
-  }, 1000);
+    status.textContent = "";
+  }, 800);
 });
 
-// زر استلام المكافأة كل 24 ساعة
+// زر الاستلام
 $("claimBtn").addEventListener("click", () => {
   const now = Date.now();
   if (now - userData.lastClaim < DAY_MS) return;
 
   userData.points += 100;
   userData.lastClaim = now;
-  localStorage.setItem('vezash_user', JSON.stringify(userData));
+  localStorage.setItem('vezash_user_v2', JSON.stringify(userData));
 
   updateUI();
 });
 
-// تحديث الواجهة والعداد
 function updateUI() {
   $("userPoints").textContent = userData.points;
 
@@ -290,7 +277,6 @@ function updateUI() {
   }
 }
 
-// التشغيل وتحديث العداد كل ثانية
 updateUI();
 setInterval(updateUI, 1000);
 </script>
