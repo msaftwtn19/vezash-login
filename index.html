@@ -848,13 +848,8 @@ $("authSubmitBtn").addEventListener("click", async () => {
 
   } catch (error) {
     console.error(error);
-    let msg = "حدث خطأ أثناء العملية.";
-    if (error.code === "auth/email-already-in-use") msg = "البريد الإلكتروني مستخدم بالفعل.";
-    if (error.code === "auth/invalid-email") msg = "البريد الإلكتروني غير صالحة صيغته.";
-    if (error.code === "auth/weak-password") msg = "كلمة السر ضعيفة (يجب أن تكون 6 أحرف على الأقل).";
-    if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found" || error.code === "auth/invalid-credential") msg = "البريد الإلكتروني أو كلمة السر غير صحيحة.";
-    
-    authStatus.textContent = msg;
+    // إظهار رمز الخطأ الصريح للتأكد من سبب الفشل
+    authStatus.textContent = `خطأ: ${error.code || error.message}`;
     authStatus.className = "status error";
   }
 });
@@ -874,7 +869,6 @@ $("year").textContent = new Date().getFullYear();
 async function start() {
   onAuthStateChanged(auth, user => {
     if (!user) {
-      // إذا لم يكن هنالك مستخدم متاح، قم بالدخول المجهول كخيار افتراضي
       signInAnonymously(auth).catch(console.error);
       return;
     }
