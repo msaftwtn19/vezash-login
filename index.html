@@ -224,18 +224,18 @@ import {
   getDatabase, 
   ref, 
   onValue, 
-  set, 
-  get 
+  set 
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCVg6fylaZjhgtAl_h_LNIOpExpBa0FZ21g",
+  apiKey: "AIzaSyCVg6fylaZjhgtAlh_LNIOpExpBa0FZ21g",
   authDomain: "vezash.firebaseapp.com",
   databaseURL: "https://vezash-default-rtdb.firebaseio.com",
   projectId: "vezash",
   storageBucket: "vezash.firebasestorage.app",
   messagingSenderId: "1069891769244",
-  appId: "1:1069891769244:web:1056f47de64789c1406e59"
+  appId: "1:1069891769244:web:1056f47de64789c1406e59",
+  measurementId: "G-02CRNVKKEL"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -271,7 +271,7 @@ $("loginBtn").addEventListener("click", async () => {
         await linkWithCredential(currentUser, cred);
         status.textContent = "تم ربط حسابك بنجاح!";
       } catch (e) {
-        if (e.code === "auth/email-already-in-use") {
+        if (e.code === "auth/email-already-in-use" || e.code === "auth/credential-already-in-use") {
           await signInWithEmailAndPassword(auth, email, password);
           status.textContent = "تم تسجيل الدخول بنجاح!";
         } else {
