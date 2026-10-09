@@ -2,283 +2,299 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>VEZASH | العداد اليومي</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>VEZASH App</title>
 <style>
-:root {
-  --bg: #0a0a0c;
-  --card-bg: rgba(18, 18, 22, 0.95);
-  --gold: #d4af37;
-  --text: #f0f0f0;
-  --muted: #a0a0a0;
-  --danger: #ff5555;
-  --green: #44ff88;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-* { box-sizing: border-box; }
-
 body {
-  margin: 0;
-  padding: 20px 16px;
-  background: 
-    linear-gradient(to bottom, rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.95)),
-    url('https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat fixed;
-  color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #0b0b0e;
+  color: #f0f0f0;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 16px;
 }
 
-.container {
+.auth-card {
   width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.card-auth, .card-timer {
-  background: var(--card-bg);
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  max-width: 380px;
+  background: #141419;
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 20px;
-  padding: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  padding: 24px 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
 }
 
-.auth-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--gold);
+.brand {
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 24px;
 }
 
-.input-group {
-  margin-bottom: 12px;
+.brand h1 {
+  color: #d4af37;
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 4px;
 }
 
-.input-group label {
+.brand p {
+  color: #888890;
+  font-size: 13px;
+}
+
+.nav-tabs {
+  display: flex;
+  background: #09090c;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #888890;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 9px;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.tab.active {
+  background: #d4af37;
+  color: #0b0b0e;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+.field label {
   display: block;
   font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 5px;
+  color: #a0a0a5;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
-.input-control {
+.input-box {
   width: 100%;
-  padding: 12px;
+  padding: 12px 14px;
+  background: #09090c;
+  border: 1px solid #2a2a32;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(0,0,0,0.6);
-  color: var(--text);
+  color: #fff;
   font-size: 14px;
   outline: none;
 }
 
-.input-control:focus {
-  border-color: var(--gold);
+.input-box:focus {
+  border-color: #d4af37;
 }
 
-.btn-auth {
+.action-btn {
   width: 100%;
   padding: 14px;
+  background: linear-gradient(135deg, #d4af37, #aa8c2c);
+  color: #0b0b0e;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--gold), #997a15);
-  color: #000;
-  font-weight: 800;
   font-size: 15px;
+  font-weight: 800;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
-.btn-auth:active { transform: scale(0.98); }
-
-.auth-status {
+.status-text {
   text-align: center;
   font-size: 13px;
-  margin-top: 10px;
+  margin-top: 14px;
+  font-weight: 700;
   min-height: 18px;
-  font-weight: 700;
 }
-.auth-status.error { color: var(--danger); }
-.auth-status.ok { color: var(--green); }
 
-.card-timer {
+.status-text.err { color: #ff5555; }
+.status-text.ok { color: #44ff88; }
+
+.dashboard {
   text-align: center;
-  padding: 30px 20px;
+  padding: 10px 0;
 }
 
-.points-badge {
-  display: inline-block;
-  background: rgba(212, 175, 55, 0.15);
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  padding: 6px 16px;
-  border-radius: 50px;
+.dashboard h2 {
+  color: #d4af37;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.dashboard p {
+  color: #a0a0a5;
   font-size: 14px;
-  font-weight: 700;
   margin-bottom: 20px;
 }
 
-.timer-display {
-  font-size: 42px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: var(--text);
-  margin: 15px 0;
-}
-
-.btn-claim {
-  width: 100%;
-  padding: 18px;
-  border: none;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ffd700, #b8860b);
-  color: #050505;
-  font-size: 18px;
-  font-weight: 900;
+.out-btn {
+  background: transparent;
+  border: 1px solid #ff5555;
+  color: #ff5555;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-}
-
-.btn-claim:disabled {
-  background: #2a2a30;
-  color: var(--muted);
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.user-info {
-  text-align: center;
-  font-size: 13px;
-  color: var(--gold);
-  line-height: 1.6;
 }
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
-  <!-- مربع تسجيل الدخول -->
-  <div class="card-auth">
-    <div class="auth-title" id="authTitle">تسجيل الدخول</div>
-    
-    <div id="authFields">
-      <div class="input-group">
-        <label>البريد الإلكتروني</label>
-        <input type="email" id="email" class="input-control" placeholder="example@gmail.com">
-      </div>
-      
-      <div class="input-group">
-        <label>كلمة السر</label>
-        <input type="password" id="password" class="input-control" placeholder="******">
-      </div>
-
-      <button type="button" class="btn-auth" id="loginBtn">حفظ ودخول</button>
+<div class="auth-card">
+  
+  <!-- نموذج الدخول والتسجيل -->
+  <div id="guestView">
+    <div class="brand">
+      <h1>VEZASH</h1>
+      <p>بوابة المستخدمين والتحكم</p>
     </div>
 
-    <div class="auth-status" id="authStatus"></div>
-    <div class="user-info" id="userInfo" style="display:none;"></div>
+    <div class="nav-tabs">
+      <button class="tab active" id="tLogin" onclick="changeMode('login')">تسجيل دخول</button>
+      <button class="tab" id="tRegister" onclick="changeMode('register')">حساب جديد</button>
+    </div>
+
+    <!-- فورم الدخول -->
+    <div id="boxLogin">
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="lEmail" class="input-box" placeholder="name@example.com">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="lPass" class="input-box" placeholder="••••••••">
+      </div>
+      <button class="action-btn" onclick="doLogin()">تسجيل الدخول</button>
+    </div>
+
+    <!-- فورم التسجيل -->
+    <div id="boxRegister" style="display: none;">
+      <div class="field">
+        <label>اسم المستخدم</label>
+        <input type="text" id="rName" class="input-box" placeholder="اسمك الكريم">
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="rEmail" class="input-box" placeholder="name@example.com">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="rPass" class="input-box" placeholder="••••••••">
+      </div>
+      <button class="action-btn" onclick="doRegister()">إنشاء الحساب</button>
+    </div>
+
+    <div class="status-text" id="feedback"></div>
   </div>
 
-  <!-- مربع العداد -->
-  <div class="card-timer">
-    <div class="points-badge">⭐ رصيدك: <span id="userPoints">0</span> نقطة</div>
-    <div style="font-size: 13px; color: var(--muted);">الوقت المتبقي للمكافأة القادمة:</div>
-    <div class="timer-display" id="timer">24:00:00</div>
-    <button type="button" class="btn-claim" id="claimBtn" disabled>استلام المكافأة اليومية</button>
+  <!-- لوحة معلومات المستخدم بعد الدخول -->
+  <div id="userView" style="display: none;" class="dashboard">
+    <h2>أهلاً بك مجدداً 🔥</h2>
+    <p id="loggedUserEmail"></p>
+    <button class="out-btn" onclick="doLogout()">تسجيل الخروج</button>
   </div>
 
 </div>
 
 <script>
-const DAY_MS = 24 * 60 * 60 * 1000;
-const $ = id => document.getElementById(id);
+const SESSION_KEY = 'vezash_github_session';
 
-let userData = JSON.parse(localStorage.getItem('vezash_user_v2')) || {
-  email: '',
-  points: 0,
-  lastClaim: 0
-};
-
-// فحص الحالة عند التحميل
-if (userData.email) {
-  $("authTitle").textContent = "حسابك مفعّل 🔐";
-  $("authFields").style.display = "none";
-  $("userInfo").style.display = "block";
-  $("userInfo").innerHTML = `مرحباً بك<br><strong>${userData.email}</strong>`;
+function initApp() {
+  const sessionData = localStorage.getItem(SESSION_KEY);
+  if (sessionData) {
+    const user = JSON.parse(sessionData);
+    document.getElementById('guestView').style.display = 'none';
+    document.getElementById('userView').style.display = 'block';
+    document.getElementById('loggedUserEmail').textContent = user.email;
+  } else {
+    document.getElementById('guestView').style.display = 'block';
+    document.getElementById('userView').style.display = 'none';
+  }
 }
 
-// استجابة زر الدخول بشكل مؤكد
-$("loginBtn").addEventListener("click", () => {
-  const emailVal = $("email").value.trim();
-  const passVal = $("password").value.trim();
-  const status = $("authStatus");
+function changeMode(mode) {
+  const tLogin = document.getElementById('tLogin');
+  const tRegister = document.getElementById('tRegister');
+  const boxLogin = document.getElementById('boxLogin');
+  const boxRegister = document.getElementById('boxRegister');
+  document.getElementById('feedback').textContent = '';
 
-  if (!emailVal || !passVal) {
-    status.textContent = "يرجى كتابة البريد وكلمة السر.";
-    status.className = "auth-status error";
+  if (mode === 'login') {
+    tLogin.classList.add('active');
+    tRegister.classList.remove('active');
+    boxLogin.style.display = 'block';
+    boxRegister.style.display = 'none';
+  } else {
+    tRegister.classList.add('active');
+    tLogin.classList.remove('active');
+    boxRegister.style.display = 'block';
+    boxLogin.style.display = 'none';
+  }
+}
+
+function showMsg(text, type) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = text;
+  fb.className = 'status-text ' + type;
+}
+
+function doLogin() {
+  const email = document.getElementById('lEmail').value.trim();
+  const pass = document.getElementById('lPass').value.trim();
+
+  if (!email || !pass) {
+    showMsg('يرجى ملء جميع الحقول', 'err');
     return;
   }
 
-  userData.email = emailVal;
-  localStorage.setItem('vezash_user_v2', JSON.stringify(userData));
-
-  status.textContent = "تم الحفظ بنجاح!";
-  status.className = "auth-status ok";
-
-  setTimeout(() => {
-    $("authTitle").textContent = "حسابك مفعّل 🔐";
-    $("authFields").style.display = "none";
-    $("userInfo").style.display = "block";
-    $("userInfo").innerHTML = `مرحباً بك<br><strong>${userData.email}</strong>`;
-    status.textContent = "";
-  }, 800);
-});
-
-// زر الاستلام
-$("claimBtn").addEventListener("click", () => {
-  const now = Date.now();
-  if (now - userData.lastClaim < DAY_MS) return;
-
-  userData.points += 100;
-  userData.lastClaim = now;
-  localStorage.setItem('vezash_user_v2', JSON.stringify(userData));
-
-  updateUI();
-});
-
-function updateUI() {
-  $("userPoints").textContent = userData.points;
-
-  const now = Date.now();
-  const diff = DAY_MS - (now - userData.lastClaim);
-
-  if (diff <= 0) {
-    $("timer").textContent = "00:00:00";
-    $("claimBtn").disabled = false;
-    $("claimBtn").textContent = "اضغط للاستلام الآن 🔥";
-  } else {
-    $("claimBtn").disabled = true;
-    $("claimBtn").textContent = "تم الاستلام اليوم ✅";
-
-    const hrs = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-    const secs = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-
-    $("timer").textContent = `${hrs}:${mins}:${secs}`;
-  }
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ email: email }));
+  showMsg('تم تسجيل الدخول بنجاح', 'ok');
+  setTimeout(initApp, 400);
 }
 
-updateUI();
-setInterval(updateUI, 1000);
+function doRegister() {
+  const name = document.getElementById('rName').value.trim();
+  const email = document.getElementById('rEmail').value.trim();
+  const pass = document.getElementById('rPass').value.trim();
+
+  if (!name || !email || !pass) {
+    showMsg('يرجى ملء كافة الحقول المطلوبة', 'err');
+    return;
+  }
+
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ name: name, email: email }));
+  showMsg('تم إنشاء الحساب بنجاح', 'ok');
+  setTimeout(initApp, 400);
+}
+
+function doLogout() {
+  localStorage.removeItem(SESSION_KEY);
+  document.getElementById('lEmail').value = '';
+  document.getElementById('lPass').value = '';
+  document.getElementById('feedback').textContent = '';
+  initApp();
+}
+
+window.onload = initApp;
 </script>
+
 </body>
 </html>
