@@ -1,90 +1,373 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEZASH - النقاط والعملات</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>VEZASH | اجمع وارقَ</title>
 
 <style>
+:root{
+  --bg:#07111f;
+  --panel:#101e31;
+  --panel2:#14263d;
+  --line:#263d59;
+  --text:#f4f8ff;
+  --muted:#9eb1ca;
+  --cyan:#59dcff;
+  --violet:#9d8bff;
+  --green:#5de0b0;
+  --gold:#ffd477;
+  --danger:#ff8795;
+  --radius:22px
+}
 *{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
 body{
-  margin:0;padding:20px;
-  font-family:Arial,sans-serif;
-  background:#07111f;color:#fff;
+  margin:0;
+  background:
+    radial-gradient(ellipse at 85% -10%,#183a61 0,transparent 36%),
+    radial-gradient(ellipse at -10% 30%,#1c2148 0,transparent 28%),
+    var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  min-height:100vh;
+  padding:0 0 calc(90px + env(safe-area-inset-bottom))
 }
-.container{max-width:500px;margin:auto}
-header{text-align:center;padding:25px 0}
-.logo{font-size:36px;font-weight:bold;color:#55d6ff}
-.subtitle{color:#a8b7ca;margin-top:10px}
+button{font:inherit;cursor:pointer}
+button:disabled{opacity:.48;cursor:not-allowed}
+.app{max-width:520px;margin:auto;padding:18px 16px 24px}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 2px 22px
+}
+.brand{display:flex;gap:11px;align-items:center}
+.brandmark{
+  width:45px;height:45px;border-radius:15px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#5ee7ff,#8178ff);
+  color:#07111f;font-weight:1000;font-size:21px;
+  box-shadow:0 8px 28px #55d6ff25
+}
+.brandname{font-size:23px;letter-spacing:1.7px;font-weight:900}
+.tagline{font-size:12px;color:var(--muted);margin-top:2px}
+.avatar{
+  border:1px solid var(--line);background:#112238;color:var(--cyan);
+  width:42px;height:42px;border-radius:14px;font-size:20px
+}
+.eyebrow{color:var(--muted);font-size:13px;margin:0 0 7px}
+.welcome{font-size:25px;font-weight:850;margin:0 0 18px;letter-spacing:-.4px}
 .card{
-  background:#111f33;
-  border:1px solid #263c57;
-  border-radius:18px;
-  padding:20px;margin-bottom:16px;
+  background:linear-gradient(145deg,#13243aee,#0e1b2eee);
+  border:1px solid #29405b;border-radius:var(--radius);
+  padding:19px;margin-bottom:14px;box-shadow:0 14px 38px #00000016
 }
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat{text-align:center}
-.number{font-size:30px;font-weight:bold;margin:14px 0;color:#55d6ff}
-h2{font-size:19px;margin-top:0}
-button{
-  width:100%;padding:14px;border:0;border-radius:12px;
-  background:#45c7f5;color:#06111e;
-  font-size:16px;font-weight:bold;cursor:pointer;
+.balancegrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.balance{
+  background:#0b1728;border:1px solid #203750;
+  border-radius:17px;padding:15px
 }
-button:disabled{opacity:.5;cursor:not-allowed}
-.note{color:#a8b7ca;font-size:13px;line-height:1.8}
-#message{margin:12px 0;line-height:1.8}
+.balance-label{font-size:12px;color:var(--muted)}
+.balance-value{
+  font-size:27px;font-weight:900;margin-top:6px;overflow-wrap:anywhere
+}
+.cyan{color:var(--cyan)}
+.gold{color:var(--gold)}
+.hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#142b48,#111b36 65%,#20234b);
+  padding:23px 20px
+}
+.hero:after{
+  content:"";position:absolute;width:180px;height:180px;border-radius:50%;
+  border:1px solid #60ddff20;left:-60px;top:-80px;
+  box-shadow:0 0 0 22px #60ddff08,0 0 0 46px #60ddff05;
+  pointer-events:none
+}
+.hero-head{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.hero h2{font-size:18px;margin:0 0 5px}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px solid #3d627e;background:#102a41;color:var(--cyan);
+  border-radius:999px;padding:6px 10px;font-size:11px;white-space:nowrap
+}
+.meter-layout{display:flex;justify-content:center;padding:17px 0 12px}
+.ring{
+  --progress:100%;
+  width:204px;height:204px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--cyan) var(--progress),#293b55 0);
+  position:relative;box-shadow:0 0 34px #48d8ff16
+}
+.ring:before{
+  content:"";position:absolute;inset:9px;border-radius:50%;
+  background:linear-gradient(145deg,#13243c,#0b1627);
+  border:1px solid #29405b
+}
+.ring-inner{position:relative;text-align:center}
+.ring-icon{font-size:23px}
+.reward-number{font-size:35px;font-weight:950;line-height:1.2;margin:7px 0}
+.ring-caption{font-size:12px;color:var(--muted)}
+.primary,.secondary,.ghost{
+  width:100%;border:0;border-radius:14px;padding:14px 16px;
+  font-weight:850;transition:transform .15s
+}
+.primary{
+  color:#06131f;background:linear-gradient(100deg,#61e4ff,#82cfff);
+  box-shadow:0 8px 22px #59dcff20
+}
+.primary:active,.secondary:active,.ghost:active{transform:scale(.985)}
+.secondary{color:#e9e7ff;background:linear-gradient(100deg,#7567ed,#a38bff)}
+.ghost{color:var(--cyan);background:#11263b;border:1px solid #29465f}
+.micro{text-align:center;font-size:12px;color:var(--muted);line-height:1.8;margin:12px 0 0}
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin:23px 2px 12px
+}
+.section-head h2{font-size:18px;margin:0}
+.section-head button{color:var(--cyan);background:none;border:0;font-size:12px}
+.quickgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick{border-radius:18px;padding:16px;background:#101f32;border:1px solid var(--line)}
+.quick-icon{font-size:23px;margin-bottom:10px}
+.quick strong{display:block;font-size:14px}
+.quick span{display:block;color:var(--muted);font-size:12px;margin-top:5px;line-height:1.6}
+.page{display:none}
+.page.active{display:block;animation:appear .22s ease}
+@keyframes appear{
+  from{opacity:.3;transform:translateY(5px)}
+  to{opacity:1;transform:none}
+}
+.meter-card{
+  position:relative;padding:18px;margin-bottom:12px;
+  border:1px solid var(--line);border-radius:20px;
+  background:linear-gradient(135deg,#13263d,#0d192b)
+}
+.meter-card.owned{border-color:#39758b}
+.meter-top{display:flex;align-items:center;gap:12px}
+.meter-icon{
+  width:51px;height:51px;display:grid;place-items:center;
+  border-radius:16px;background:#1c3850;font-size:25px
+}
+.meter-title{font-weight:850;font-size:16px}
+.meter-desc{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.6}
+.meter-reward{font-size:22px;font-weight:900;color:var(--cyan);margin:15px 0 4px}
+.meter-cost{font-size:12px;color:var(--muted);margin-bottom:13px}
+.meter-card .primary,.meter-card .secondary,.meter-card .ghost{padding:12px}
+.owned-tag{
+  margin-right:auto;color:var(--green);font-size:11px;
+  border:1px solid #316e62;background:#12332f;
+  padding:5px 8px;border-radius:999px
+}
+.history{
+  display:flex;align-items:center;gap:12px;padding:13px 0;
+  border-bottom:1px solid #26384e
+}
+.history:last-child{border-bottom:0}
+.history-icon{
+  width:39px;height:39px;border-radius:13px;
+  display:grid;place-items:center;background:#1a3047
+}
+.history-copy{flex:1}
+.history-title{font-size:13px;font-weight:750}
+.history-date{font-size:11px;color:var(--muted);margin-top:4px}
+.history-amount{font-size:14px;font-weight:850;color:var(--green)}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:25px 10px}
+.notice{
+  padding:12px 14px;border-radius:14px;background:#11253a;
+  border:1px solid #29435c;color:var(--muted);
+  font-size:12px;line-height:1.8;margin-bottom:14px
+}
+.notice strong{color:var(--cyan)}
+.status{min-height:22px;color:var(--muted);font-size:12px;line-height:1.7;margin:8px 2px}
+.status.error{color:var(--danger)}
+.status.ok{color:var(--green)}
+.bottomnav{
+  position:fixed;z-index:5;bottom:0;left:0;right:0;
+  padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+  background:#081321ed;border-top:1px solid #263950;backdrop-filter:blur(18px)
+}
+.navinner{max-width:520px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.navbtn{
+  border:0;border-radius:14px;padding:9px 5px;background:transparent;
+  color:#8096b1;font-size:11px;font-weight:700
+}
+.navbtn .navicon{font-size:20px;display:block;margin-bottom:3px}
+.navbtn.active{background:#142c42;color:var(--cyan)}
+.footer{text-align:center;color:#637b98;font-size:10px;margin:25px 0 8px}
+.hidden{display:none!important}
+@media(max-width:370px){
+  .app{padding-left:12px;padding-right:12px}
+  .ring{width:180px;height:180px}
+  .reward-number{font-size:30px}
+  .welcome{font-size:22px}
+}
 </style>
 </head>
 
 <body>
-<div class="container">
-  <header>
-    <div class="logo">VEZASH</div>
-    <div class="subtitle">اجمع النقاط واستبدلها بالعملات</div>
-  </header>
+<div class="app">
 
-  <div class="card stats">
-    <div class="stat">
-      <h2>⭐ نقاطك</h2>
-      <div class="number" id="points">0</div>
-    </div>
-    <div class="stat">
-      <h2>🪙 عملاتك</h2>
-      <div class="number" id="coins">0</div>
+<header class="topbar">
+  <div class="brand">
+    <div class="brandmark">V</div>
+    <div>
+      <div class="brandname">VEZASH</div>
+      <div class="tagline">اجمع النقاط • طوّر عداداتك</div>
     </div>
   </div>
+  <button class="avatar" id="profileBtn" aria-label="الملف الشخصي">✦</button>
+</header>
 
-  <div class="card">
-    <h2>🎁 المكافأة اليومية</h2>
-    <p>استلم 10 نقاط كل 24 ساعة.</p>
-    <button id="claimBtn" disabled>جاري الاتصال...</button>
-    <p class="note" id="timer"></p>
-  </div>
-
-  <div class="card">
-    <h2>🛒 متجر العملات</h2>
-    <p>استبدل 100 نقطة مقابل 10 عملات.</p>
-    <button id="buyBtn" disabled>استبدال 100 نقطة</button>
-  </div>
-
-  <div id="message" role="status">جاري الاتصال بقاعدة البيانات...</div>
-  <p class="note">VEZASH ©</p>
+<div class="notice" id="connectionNotice">
+  <strong>أهلاً بك في VEZASH</strong><br>
+  نجهّز حسابك الآمن…
 </div>
+
+<main>
+  <section class="page active" id="homePage">
+    <p class="eyebrow">أهلاً بيك من جديد 👋</p>
+    <h1 class="welcome">كل يوم فرصة جديدة</h1>
+
+    <div class="card">
+      <div class="balancegrid">
+        <div class="balance">
+          <div class="balance-label">⭐ مجموع النقاط</div>
+          <div class="balance-value cyan" id="pointsValue">—</div>
+        </div>
+        <div class="balance">
+          <div class="balance-label">🪙 العملات</div>
+          <div class="balance-value gold" id="coinsValue">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hero">
+      <div class="hero-head">
+        <div>
+          <h2>🎁 المكافأة اليومية</h2>
+          <div class="eyebrow">استلم مكافآت عداداتك كل 24 ساعة</div>
+        </div>
+        <span class="pill" id="meterCount">عداد واحد</span>
+      </div>
+
+      <div class="meter-layout">
+        <div class="ring" id="rewardRing" style="--progress:100%">
+          <div class="ring-inner">
+            <div class="ring-icon">⚡</div>
+            <div class="reward-number" id="dailyReward">100</div>
+            <div class="ring-caption">نقطة مستحقة يومياً</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary" id="claimBtn" disabled>جاري الاتصال…</button>
+      <p class="micro" id="timerText">تأكد من الاتصال بالإنترنت</p>
+    </div>
+
+    <div class="section-head">
+      <h2>وصول سريع</h2>
+      <button data-page="store">اكتشف المتجر ←</button>
+    </div>
+
+    <div class="quickgrid">
+      <div class="quick">
+        <div class="quick-icon">🚀</div>
+        <strong>طوّر عدادك</strong>
+        <span>مكافآت يومية أكبر مع العدادات المطوّرة.</span>
+      </div>
+      <div class="quick">
+        <div class="quick-icon">🛡️</div>
+        <strong>حساب بدون تسجيل</strong>
+        <span>ندخلك تلقائياً بدون بريد أو رقم هاتف.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="storePage">
+    <p class="eyebrow">متجر VEZASH</p>
+    <h1 class="welcome">اختَر مستوى مكافأتك</h1>
+    <div class="notice">
+      تُشترى العدادات المعروضة هنا <strong>بالعملات داخل التطبيق</strong>.
+      هذه نسخة تجريبية؛ الدفع الحقيقي غير مفعّل.
+    </div>
+    <div id="storeItems"></div>
+    <div class="status" id="storeStatus" role="status"></div>
+  </section>
+
+  <section class="page" id="walletPage">
+    <p class="eyebrow">رصيدك ونشاطك</p>
+    <h1 class="welcome">المحفظة</h1>
+
+    <div class="card">
+      <div class="balancegrid">
+        <div class="balance">
+          <div class="balance-label">⭐ النقاط</div>
+          <div class="balance-value cyan" id="walletPoints">—</div>
+        </div>
+        <div class="balance">
+          <div class="balance-label">🪙 العملات</div>
+          <div class="balance-value gold" id="walletCoins">—</div>
+        </div>
+      </div>
+
+      <div style="margin-top:17px">
+        <button class="secondary" id="exchangeBtn" disabled>
+          استبدال 100 نقطة بـ 10 عملات
+        </button>
+      </div>
+
+      <p class="micro">هذا الاستبدال داخل التطبيق فقط، وليس سحباً نقدياً.</p>
+    </div>
+
+    <div class="section-head"><h2>آخر العمليات</h2></div>
+    <div class="card" id="historyList">
+      <div class="empty">لا توجد عمليات بعد.</div>
+    </div>
+  </section>
+</main>
+
+<div class="status" id="globalStatus" role="status" aria-live="polite"></div>
+<div class="footer">VEZASH © <span id="year"></span> • إصدار تجريبي</div>
+</div>
+
+<nav class="bottomnav" aria-label="التنقل الرئيسي">
+  <div class="navinner">
+    <button class="navbtn active" data-page="home">
+      <span class="navicon">⌂</span>الرئيسية
+    </button>
+    <button class="navbtn" data-page="store">
+      <span class="navicon">✧</span>المتجر
+    </button>
+    <button class="navbtn" data-page="wallet">
+      <span class="navicon">▣</span>المحفظة
+    </button>
+  </div>
+</nav>
 
 <script type="module">
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 
-import { getAuth, signInAnonymously }
-  from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
-import { getDatabase, ref, get, runTransaction }
-  from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
+import {
+  getFunctions,
+  httpsCallable
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-functions.js";
+
+// إعدادات مشروع VEZASH الحالية.
+// لا تضع مفاتيح Admin أو Service Account داخل هذا الملف.
 const firebaseConfig = {
-  apiKey: "AIzaSyCVg6fylaZjhgtAlh_LNIOpExpBa0FZ21g",
+  apiKey: "AIzaSyCVg6fylaZjhgtAl_h_LNIOpExpBa0FZ21g",
   authDomain: "vezash.firebaseapp.com",
   databaseURL: "https://vezash-default-rtdb.firebaseio.com",
   projectId: "vezash",
@@ -97,141 +380,409 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+const functions = getFunctions(app, "us-central1");
 
-const pointsEl = document.getElementById("points");
-const coinsEl = document.getElementById("coins");
-const claimBtn = document.getElementById("claimBtn");
-const buyBtn = document.getElementById("buyBtn");
-const timerEl = document.getElementById("timer");
-const messageEl = document.getElementById("message");
+const claimReward = httpsCallable(functions, "claimReward");
+const buyMeter = httpsCallable(functions, "buyMeter");
+const exchangePoints = httpsCallable(functions, "exchangePoints");
 
-const DAY = 24 * 60 * 60 * 1000;
-let userRef = null;
-let busy = false;
+const $ = id => document.getElementById(id);
+const DAY = 86400000;
 
-function message(text) {
-  messageEl.textContent = text;
-}
-
-function showData(data) {
-  const points = Number(data.points || 0);
-  const coins = Number(data.coins || 0);
-  const lastClaim = Number(data.lastClaim || 0);
-
-  pointsEl.textContent = points;
-  coinsEl.textContent = coins;
-
-  const remaining = DAY - (Date.now() - lastClaim);
-
-  claimBtn.disabled = busy || remaining > 0;
-
-  if (remaining <= 0) {
-    claimBtn.textContent = "استلام 10 نقاط";
-    timerEl.textContent = "مكافأتك اليومية جاهزة!";
-  } else {
-    claimBtn.textContent = "تم استلام المكافأة";
-    const hours = Math.floor(remaining / 3600000);
-    const minutes = Math.ceil((remaining % 3600000) / 60000);
-    timerEl.textContent =
-      `المكافأة القادمة بعد ${hours} ساعة و${minutes} دقيقة تقريباً`;
+const catalog = [
+  {
+    id: "basic",
+    name: "العداد الأساسي",
+    icon: "⚡",
+    reward: 100,
+    cost: 0,
+    description: "عداد مجاني لكل مستخدم، ومكافأته مرة كل 24 ساعة."
+  },
+  {
+    id: "plus",
+    name: "عداد بلس",
+    icon: "🚀",
+    reward: 500,
+    cost: 100,
+    description: "مكافأة يومية أعلى للمستخدمين النشطين."
+  },
+  {
+    id: "pro",
+    name: "عداد برو",
+    icon: "💎",
+    reward: 1000,
+    cost: 500,
+    description: "مكافأة يومية كبيرة مع كل استلام مؤهل."
   }
+];
 
-  buyBtn.disabled = busy || points < 100;
+let currentUser = null;
+let userData = null;
+let unsub = null;
+let busy = false;
+let tick = null;
+
+const fmt = n => new Intl.NumberFormat("ar-IQ").format(Number(n || 0));
+
+function status(text, type = "") {
+  const el = $("globalStatus");
+  el.textContent = text;
+  el.className = "status " + type;
 }
 
-async function refresh() {
-  const snapshot = await get(userRef);
-  showData(snapshot.val() || {
-    points: 0,
-    coins: 0,
-    lastClaim: 0
+function setConnection(text, show = true) {
+  $("connectionNotice").innerHTML = text;
+  $("connectionNotice").classList.toggle("hidden", !show);
+}
+
+function ownedMeters() {
+  return userData?.meters || { basic: true };
+}
+
+function ownedReward() {
+  return catalog.reduce(
+    (sum, meter) => sum + (ownedMeters()[meter.id] ? meter.reward : 0),
+    0
+  ) || 100;
+}
+
+function nextReady() {
+  return Number(userData?.lastClaim || 0) + DAY;
+}
+
+function render() {
+  if (!userData) return;
+
+  const points = Number(userData.points || 0);
+  const coins = Number(userData.coins || 0);
+
+  $("pointsValue").textContent = fmt(points);
+  $("coinsValue").textContent = fmt(coins);
+  $("walletPoints").textContent = fmt(points);
+  $("walletCoins").textContent = fmt(coins);
+
+  const reward = ownedReward();
+  $("dailyReward").textContent = fmt(reward);
+
+  const count = catalog.filter(m => ownedMeters()[m.id]).length;
+  $("meterCount").textContent =
+    fmt(count) + (count === 1 ? " عداد" : " عدادات");
+
+  const remain = Math.max(0, nextReady() - Date.now());
+
+  $("claimBtn").disabled = busy || remain > 0;
+  $("claimBtn").textContent = busy
+    ? "جاري التنفيذ…"
+    : remain > 0
+      ? "المكافأة قيد الانتظار"
+      : "استلم مكافأتك";
+
+  $("timerText").textContent = remain > 0
+    ? "المكافأة القادمة بعد " +
+      fmt(Math.floor(remain / 3600000)) +
+      " ساعة و" +
+      fmt(Math.floor((remain % 3600000) / 60000)) +
+      " دقيقة تقريباً"
+    : "مكافأتك اليومية جاهزة!";
+
+  const progress = remain > 0
+    ? Math.max(0, 100 * (1 - remain / DAY))
+    : 100;
+
+  $("rewardRing").style.setProperty("--progress", progress + "%");
+  $("exchangeBtn").disabled = busy || points < 100;
+
+  renderStore();
+  renderHistory();
+}
+
+function renderStore() {
+  const target = $("storeItems");
+  target.innerHTML = "";
+
+  catalog.forEach(meter => {
+    const owned = !!ownedMeters()[meter.id];
+
+    const el = document.createElement("article");
+    el.className = "meter-card" + (owned ? " owned" : "");
+
+    const top = document.createElement("div");
+    top.className = "meter-top";
+
+    const icon = document.createElement("div");
+    icon.className = "meter-icon";
+    icon.textContent = meter.icon;
+
+    const copy = document.createElement("div");
+    copy.style.flex = "1";
+
+    const title = document.createElement("div");
+    title.className = "meter-title";
+    title.textContent = meter.name;
+
+    const desc = document.createElement("div");
+    desc.className = "meter-desc";
+    desc.textContent = meter.description;
+
+    copy.append(title, desc);
+    top.append(icon, copy);
+
+    if (owned) {
+      const badge = document.createElement("span");
+      badge.className = "owned-tag";
+      badge.textContent = "مملوك";
+      top.append(badge);
+    }
+
+    const reward = document.createElement("div");
+    reward.className = "meter-reward";
+    reward.textContent = "+" + fmt(meter.reward) + " نقطة / يوم";
+
+    const cost = document.createElement("div");
+    cost.className = "meter-cost";
+    cost.textContent = meter.cost === 0
+      ? "مجاني"
+      : "السعر: " + fmt(meter.cost) + " عملة";
+
+    const btn = document.createElement("button");
+    btn.className = owned
+      ? "ghost"
+      : meter.cost === 0
+        ? "ghost"
+        : "secondary";
+
+    btn.textContent = owned
+      ? "هذا العداد عندك"
+      : meter.cost === 0
+        ? "العداد الأساسي مجاني"
+        : "شراء العداد";
+
+    btn.disabled =
+      busy ||
+      owned ||
+      meter.cost === 0 ||
+      Number(userData?.coins || 0) < meter.cost;
+
+    btn.addEventListener("click", () => doBuy(meter.id));
+
+    el.append(top, reward, cost, btn);
+    target.append(el);
   });
 }
 
-async function transact(action) {
-  if (busy || !userRef) return;
+function renderHistory() {
+  const target = $("historyList");
+  target.innerHTML = "";
+
+  const entries = Object.values(userData?.history || {})
+    .filter(item => item && typeof item === "object")
+    .sort((a, b) => Number(b.at || 0) - Number(a.at || 0))
+    .slice(0, 15);
+
+  if (!entries.length) {
+    target.innerHTML =
+      '<div class="empty">عملياتك راح تظهر هنا من تبدأ تجمع النقاط.</div>';
+    return;
+  }
+
+  entries.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "history";
+
+    const icon = document.createElement("div");
+    icon.className = "history-icon";
+    icon.textContent =
+      item.type === "claim" ? "🎁" :
+      item.type === "buy" ? "🚀" :
+      item.type === "exchange" ? "🔁" : "✦";
+
+    const copy = document.createElement("div");
+    copy.className = "history-copy";
+
+    const title = document.createElement("div");
+    title.className = "history-title";
+    title.textContent = item.label || "عملية رصيد";
+
+    const date = document.createElement("div");
+    date.className = "history-date";
+    date.textContent = item.at
+      ? new Date(item.at).toLocaleString("ar-IQ")
+      : "";
+
+    copy.append(title, date);
+
+    const amount = document.createElement("div");
+    amount.className = "history-amount";
+    amount.textContent =
+      item.deltaPoints > 0
+        ? "+" + fmt(item.deltaPoints) + " نقطة"
+        : item.deltaCoins > 0
+          ? "+" + fmt(item.deltaCoins) + " عملة"
+          : "تمت";
+
+    row.append(icon, copy, amount);
+    target.append(row);
+  });
+}
+
+async function perform(fn, args, success) {
+  if (busy) return;
 
   busy = true;
-  claimBtn.disabled = true;
-  buyBtn.disabled = true;
-  message("جاري تنفيذ العملية...");
+  render();
+  status("جاري تنفيذ العملية…");
 
   try {
-    let reason = "";
-
-    const result = await runTransaction(userRef, current => {
-      const data = current || {
-        points: 0,
-        coins: 0,
-        lastClaim: 0
-      };
-
-      data.points = Number(data.points || 0);
-      data.coins = Number(data.coins || 0);
-      data.lastClaim = Number(data.lastClaim || 0);
-
-      if (action === "claim") {
-        if (Date.now() - data.lastClaim < DAY) {
-          reason = "استلمت المكافأة خلال آخر 24 ساعة.";
-          return;
-        }
-
-        data.points += 10;
-        data.lastClaim = Date.now();
-      }
-
-      if (action === "buy") {
-        if (data.points < 100) {
-          reason = "تحتاج إلى 100 نقطة حتى تستبدلها.";
-          return;
-        }
-
-        data.points -= 100;
-        data.coins += 10;
-      }
-
-      return data;
-    });
-
-    if (result.committed) {
-      message(action === "claim"
-        ? "تمت إضافة 10 نقاط إلى رصيدك!"
-        : "تم استبدال 100 نقطة بـ10 عملات!");
-    } else {
-      message(reason || "لم تكتمل العملية. حاول مرة ثانية.");
-    }
-
-    await refresh();
+    const result = await fn(args || {});
+    status(result.data?.message || success, "ok");
   } catch (error) {
     console.error(error);
-    message("تعذر الاتصال بقاعدة البيانات. تحقق من إعدادات Firebase.");
+
+    const code = error?.code || "";
+
+    const messages = {
+      "functions/failed-precondition":
+        "الشروط غير مكتملة أو المكافأة لم يحن موعدها.",
+      "functions/permission-denied":
+        "العملية غير مسموحة لهذا الحساب.",
+      "functions/resource-exhausted":
+        "رصيدك غير كافٍ لإتمام العملية.",
+      "functions/unauthenticated":
+        "انتهت الجلسة. أعد فتح التطبيق.",
+      "functions/unavailable":
+        "الخدمة غير متاحة حالياً. حاول لاحقاً."
+    };
+
+    status(
+      messages[code] ||
+      error?.message ||
+      "تعذّر إتمام العملية. تأكد من نشر وظائف Firebase وقواعد الأمان.",
+      "error"
+    );
   } finally {
     busy = false;
-    try {
-      await refresh();
-    } catch (error) {
-      console.error(error);
-    }
+    render();
   }
 }
 
-claimBtn.addEventListener("click", () => transact("claim"));
-buyBtn.addEventListener("click", () => transact("buy"));
+function doBuy(meterId) {
+  const meter = catalog.find(item => item.id === meterId);
+  if (!meter) return;
+
+  if (!confirm(
+    `تريد تشتري ${meter.name} مقابل ${fmt(meter.cost)} عملة؟`
+  )) return;
+
+  perform(buyMeter, { meterId }, "تم شراء العداد بنجاح.");
+}
+
+$("claimBtn").addEventListener("click", () => {
+  perform(claimReward, {}, "تمت إضافة مكافأتك اليومية.");
+});
+
+$("exchangeBtn").addEventListener("click", () => {
+  if (confirm("تريد استبدال 100 نقطة مقابل 10 عملات؟")) {
+    perform(exchangePoints, {}, "تم الاستبدال بنجاح.");
+  }
+});
+
+document.querySelectorAll("[data-page]").forEach(button => {
+  button.addEventListener("click", () => {
+    const page = button.dataset.page;
+
+    document.querySelectorAll(".page").forEach(section => {
+      section.classList.toggle("active", section.id === page + "Page");
+    });
+
+    document.querySelectorAll(".navbtn").forEach(nav => {
+      nav.classList.toggle("active", nav.dataset.page === page);
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+$("profileBtn").addEventListener("click", () => {
+  alert(
+    "حسابك مجهول ومحفوظ على هذا الجهاز. إذا حذفت بيانات التطبيق " +
+    "أو بدّلت الجهاز فقد تفقد إمكانية الوصول للحساب؛ سنضيف ربط الحساب لاحقاً إذا احتجته."
+  );
+});
+
+$("year").textContent = new Date().getFullYear();
 
 async function start() {
   try {
-    const credential = await signInAnonymously(auth);
-    userRef = ref(db, "users/" + credential.user.uid);
+    await signInAnonymously(auth);
 
-    await refresh();
-    message("تم الاتصال بـ VEZASH بنجاح.");
+    onAuthStateChanged(auth, user => {
+      if (!user) return;
+
+      currentUser = user;
+
+      if (unsub) unsub();
+
+      unsub = onValue(
+        ref(db, "users/" + user.uid),
+        snapshot => {
+          userData = snapshot.val() || {
+            points: 0,
+            coins: 0,
+            lastClaim: 0,
+            meters: { basic: true },
+            history: {}
+          };
+
+          if (!userData.meters) {
+            userData.meters = { basic: true };
+          }
+
+          if (!userData.meters.basic) {
+            userData.meters.basic = true;
+          }
+
+          render();
+
+          setConnection(
+            "<strong>تم الاتصال بـ VEZASH</strong><br>" +
+            "حساب مجهول جاهز. حافظ على بيانات التطبيق حتى لا تفقد الوصول إلى حسابك.",
+            false
+          );
+        },
+        error => {
+          console.error(error);
+
+          setConnection(
+            "<strong>تعذّر تحميل الرصيد</strong><br>" +
+            "تحقق من قواعد قراءة Firebase.",
+            true
+          );
+
+          status("تعذّر تحميل بياناتك.", "error");
+        }
+      );
+    });
   } catch (error) {
     console.error(error);
-    message("فشل الاتصال. تأكد من تفعيل Anonymous Auth وقواعد قاعدة البيانات في Firebase.");
+
+    setConnection(
+      "<strong>تعذّر الاتصال</strong><br>" +
+      "فعّل Anonymous Authentication وتأكد من إعدادات Firebase.",
+      true
+    );
+
+    status(
+      "تعذّر تسجيل الدخول المجهول. راجع إعدادات Firebase Authentication.",
+      "error"
+    );
   }
 }
 
 start();
+
+tick = setInterval(() => {
+  if (userData) render();
+}, 30000);
 </script>
 </body>
 </html>
