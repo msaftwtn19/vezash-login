@@ -8,7 +8,7 @@
 <style>
 :root {
   --bg: #0a0a0c;
-  --card-bg: rgba(18, 18, 22, 0.85);
+  --card-bg: rgba(18, 18, 22, 0.9);
   --gold: #d4af37;
   --gold-glow: #ffd700;
   --text: #f0f0f0;
@@ -165,7 +165,8 @@ body {
 .user-info {
   text-align: center;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--gold);
+  line-height: 1.6;
 }
 </style>
 </head>
@@ -176,7 +177,7 @@ body {
 
   <!-- مربع تسجيل الدخول العلوي -->
   <div class="card-auth" id="authBox">
-    <div class="auth-title" id="authTitle">تسجيل الدخول / حساب جديد</div>
+    <div class="auth-title" id="authTitle">تسجيل الدخول الحساب</div>
     
     <div id="authFields">
       <div class="input-group">
@@ -189,7 +190,7 @@ body {
         <input type="password" id="password" class="input-control" placeholder="******">
       </div>
 
-      <button class="btn-auth" id="loginBtn">دخول / حفظ الحساب</button>
+      <button class="btn-auth" id="loginBtn">حفظ الدخول</button>
     </div>
 
     <div class="auth-status" id="authStatus"></div>
@@ -208,138 +209,70 @@ body {
 
 </div>
 
-<script type="module">
-import { initializeApp } 
-  from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { 
-  getAuth, 
-  signInAnonymously, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  linkWithCredential, 
-  EmailAuthProvider, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { 
-  getDatabase, 
-  ref, 
-  onValue, 
-  set 
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCVg6fylaZjhgtAlh_LNIOpExpBa0FZ21g",
-  authDomain: "vezash.firebaseapp.com",
-  databaseURL: "https://vezash-default-rtdb.firebaseio.com",
-  projectId: "vezash",
-  storageBucket: "vezash.firebasestorage.app",
-  messagingSenderId: "1069891769244",
-  appId: "1:1069891769244:web:1056f47de64789c1406e59",
-  measurementId: "G-02CRNVKKEL"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
+<script>
 const DAY_MS = 24 * 60 * 60 * 1000; // 24 ساعة
-let currentUser = null;
-let lastClaimTime = 0;
-let points = 0;
 
 const $ = id => document.getElementById(id);
 
-// تسجيل الدخول أو إنشاء حساب
-$("loginBtn").addEventListener("click", async () => {
+// استرجاع البيانات المحفوظة محلياً
+let userData = JSON.parse(localStorage.getItem('vezash_user')) || {
+  email: '',
+  points: 0,
+  lastClaim: 0
+};
+
+// التحقق من حالة تسجيل الدخول السابقة
+if (userData.email) {
+  $("authTitle").textContent = "حسابك مفعّل 🔐";
+  $("authFields").style.display = "none";
+  $("userInfo").style.display = "block";
+  $("userInfo").innerHTML = `مرحباً بك<br><strong>${userData.email}</strong>`;
+}
+
+// زر تسجيل الدخول
+$("loginBtn").addEventListener("click", () => {
   const email = $("email").value.trim();
   const password = $("password").value.trim();
   const status = $("authStatus");
 
   if (!email || !password) {
-    status.textContent = "ادخل البريد وكلمة السر.";
+    status.textContent = "يرجى كتابة البريد وكلمة السر.";
     status.className = "auth-status error";
     return;
   }
 
-  status.textContent = "جاري الحفظ…";
-  status.className = "auth-status";
+  userData.email = email;
+  localStorage.setItem('vezash_user', JSON.stringify(userData));
 
-  try {
-    if (currentUser && currentUser.isAnonymous) {
-      try {
-        const cred = EmailAuthProvider.credential(email, password);
-        await linkWithCredential(currentUser, cred);
-        status.textContent = "تم ربط حسابك بنجاح!";
-      } catch (e) {
-        if (e.code === "auth/email-already-in-use" || e.code === "auth/credential-already-in-use") {
-          await signInWithEmailAndPassword(auth, email, password);
-          status.textContent = "تم تسجيل الدخول بنجاح!";
-        } else {
-          await createUserWithEmailAndPassword(auth, email, password);
-          status.textContent = "تم إنشاء الحساب بنجاح!";
-        }
-      }
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-      status.textContent = "تم تسجيل الدخول بنجاح!";
-    }
-    status.className = "auth-status ok";
-  } catch (err) {
-    status.textContent = "خطأ: " + (err.code || err.message);
-    status.className = "auth-status error";
-  }
+  status.textContent = "تم حفظ الحساب بنجاح!";
+  status.className = "auth-status ok";
+
+  setTimeout(() => {
+    $("authTitle").textContent = "حسابك مفعّل 🔐";
+    $("authFields").style.display = "none";
+    $("userInfo").style.display = "block";
+    $("userInfo").innerHTML = `مرحباً بك<br><strong>${userData.email}</strong>`;
+  }, 1000);
 });
 
-// عند الضغط على زر الاستلام مرة واحدة كل 24 ساعة
-$("claimBtn").addEventListener("click", async () => {
-  if (!currentUser) return;
-
+// زر استلام المكافأة كل 24 ساعة
+$("claimBtn").addEventListener("click", () => {
   const now = Date.now();
-  if (now - lastClaimTime < DAY_MS) return;
+  if (now - userData.lastClaim < DAY_MS) return;
 
-  points += 100; // مكافأة 100 نقطة
-  lastClaimTime = now;
-
-  // حفظ بالـ Firebase
-  await set(ref(db, "users/" + currentUser.uid), {
-    points: points,
-    lastClaim: lastClaimTime
-  });
+  userData.points += 100;
+  userData.lastClaim = now;
+  localStorage.setItem('vezash_user', JSON.stringify(userData));
 
   updateUI();
 });
 
-// مراقبة حالة الحساب والبيانات
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    signInAnonymously(auth);
-    return;
-  }
-
-  currentUser = user;
-
-  if (!user.isAnonymous) {
-    $("authTitle").textContent = "حسابك مفعّل 🔐";
-    $("authFields").style.display = "none";
-    $("userInfo").style.display = "block";
-    $("userInfo").textContent = "البريد: " + user.email;
-  }
-
-  // جلب البيانات من قاعدة البيانات
-  onValue(ref(db, "users/" + user.uid), snapshot => {
-    const data = snapshot.val() || {};
-    points = data.points || 0;
-    lastClaimTime = data.lastClaim || 0;
-    updateUI();
-  });
-});
-
-// تحديث العداد والزر
+// تحديث الواجهة والعداد
 function updateUI() {
-  $("userPoints").textContent = points;
+  $("userPoints").textContent = userData.points;
 
   const now = Date.now();
-  const diff = DAY_MS - (now - lastClaimTime);
+  const diff = DAY_MS - (now - userData.lastClaim);
 
   if (diff <= 0) {
     $("timer").textContent = "00:00:00";
@@ -357,7 +290,8 @@ function updateUI() {
   }
 }
 
-// تحديث العداد كل ثانية
+// التشغيل وتحديث العداد كل ثانية
+updateUI();
 setInterval(updateUI, 1000);
 </script>
 </body>
